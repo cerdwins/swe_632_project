@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>To Do App</title>
+  </head>
+  <body>
+    <div>
+        <input type="text" id="input1" value="Get High">
+        <input type="text" id="input2" value="10/09/1987">
+        <form>
+            <input id="import-norm" name="importance" type="radio" value="norm">
+            <input id="import-high" name="importance" type="radio" value="high" checked>
+            <input id="import-very" name="importance" type="radio" value="very">
+        </form>
+    </div>
+
+    <script>
+        function createLogValue(){
+            var appointment_text = document.getElementById("input1").value;
+            var appointment_date = document.getElementById("input2").value;
+            var temp_importance = document.getElementsByName("importance");
+            var appointment_import = null;
+            for(i = 0; i < temp_importance.length - 1; i++){
+                if(temp_importance[i].checked){
+                    appointment_import = temp_importance[i].value;
+                    break;
+                }
+            }
+            console.log(appointment_text);
+            console.log(appointment_date);
+            console.log(appointment_import);
+        }
+    </script>
+
+  </body>
+</html>
