@@ -1,0 +1,13 @@
+.team {
+    width: 50%;
+}
+
+.nav-link {
+    text-decoration: none !important;
+    color: white !important;
+}
+
+.nav-link:hover {
+    text-decoration: none !important;
+    color: white !important;
+}
