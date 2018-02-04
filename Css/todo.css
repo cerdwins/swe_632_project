@@ -1,0 +1,93 @@
+.bg-gray {
+    background: #eeeeee;
+}
+
+.mainDiv {
+    min-height: 800px;
+}
+
+.card-text {
+    font-weight: bold;
+}
+
+.very-high-importance {
+    color: #EA2027;
+}
+
+.high-importance {
+    color: #887702;
+}
+
+.color-green {
+    color: #27ae60 !important;
+}
+
+.color-red {
+    color: #EA2027 !important;
+}
+
+.trash {
+    cursor: pointer;
+    color: #EA2027 !important;
+}
+
+#display-todo .list-group-item {
+    padding: 0 2rem !important;
+    margin-top: 1px !important;
+}
+
+.completed-item {
+    text-decoration: line-through;
+}
+
+.list-group-item label,
+.list-group-item input {
+    cursor: pointer;
+}
+
+.normal-importance {
+    color: #0984e3;
+}
+
+.scroll {
+    overflow: scroll;
+}
+
+#mainCalendar {
+    width: 96%;
+}
+
+#todoItem {
+    padding: 5%;
+}
+
+.btn-main {
+    color: white;
+    background: #6c5ce7;
+}
+
+.btn-main:hover {
+    color: white;
+    background: #6a5be2;
+}
+
+.small-text {
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.link {
+    cursor: pointer;
+}
+
+.veryHighList {
+    border-left: 3px solid #EA2027 !important;
+}
+
+.highList {
+    border-left: 3px solid #887702 !important;
+}
+
+.normalList {
+    border-left: 3px solid #0984e3 !important;
+}
