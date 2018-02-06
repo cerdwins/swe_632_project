@@ -1,0 +1,12 @@
+{
+    "index": 7, //his is the total number of items in the storage
+    "items": [
+        { "id": 1, "name": "helo", "dueDate": "2018-02-06T05:00:00.000Z", "importance": "veryHigh", "isCompleted": false },
+        { "id": 2, "name": "helofdsadf", "dueDate": "2018-02-06T05:00:00.000Z", "importance": "veryHigh", "isCompleted": false },
+        { "id": 3, "name": "helofdsadffasdf", "dueDate": "2018-02-06T05:00:00.000Z", "importance": "high", "isCompleted": false },
+        { "id": 4, "name": "helofdsadffasdffasdf", "dueDate": "2018-02-06T05:00:00.000Z", "importance": "normal", "isCompleted": false },
+        { "id": 5, "name": "grocery", "dueDate": "2/15/2018", "importance": "veryHigh", "isCompleted": false },
+        { "id": 6, "name": "grocery", "dueDate": "2/6/2018", "importance": "veryHigh", "isCompleted": false },
+        { "id": 7, "name": "hello", "dueDate": "2018-02-06T05:00:00.000Z", "importance": "veryHigh", "isCompleted": false }
+    ]
+}
