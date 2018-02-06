@@ -1,12 +1,5 @@
 $(document).ready(function() {
     // create Calendar from div HTML element
-<<<<<<< HEAD
-    $("#mainCalendar").kendoCalendar();
-    $("#fromDate").kendoDatePicker({
-
-        // display month and year in the input
-        format: "MMMM yyyy",
-=======
     $("#mainCalendar").kendoCalendar({
         format: "MM/dd/yyyy",
         change: calendarChange
@@ -16,15 +9,10 @@ $(document).ready(function() {
 
         // display month and year in the input
         format: "MM/dd/yyyy",
->>>>>>> master
     });
     $("#toDate").kendoDatePicker({
 
         // display month and year in the input
-<<<<<<< HEAD
-        format: "MMMM yyyy",
-    });
-=======
         format: "MM/dd/yyyy",
     });
     //Class to create todo Object
@@ -184,5 +172,4 @@ $(document).ready(function() {
     });
 
 
->>>>>>> master
 });
