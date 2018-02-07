@@ -29,6 +29,23 @@
                         <span class="navbar-toggler-icon "></span>
                       </button>
     </nav>
+
+<script>
+$("#todo-list-very").click(function(){
+    var data = [];
+    data = searchByImportance("veryhigh");
+    $("#todo-list-very-hiddenlist").html("<ul id='very-newlist'></ul>");
+    for(x = 0; x < data.length; x++){
+        console.log[x];
+    }
+});
+
+
+</script>
+
+
+
+
     <div class="row bg-gray mainDiv ">
         <div class="col-sm-3 card bg-white padding-all-one padding-left-two scroll  ">
             <div class="small-spacer"></div>
@@ -36,15 +53,16 @@
             <div class="small-spacer"></div>
             <p class="card-text "><i class="fa fa-exclamation-circle"></i>Categorized By Importance</p>
             <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link" data-toggle="collapse"><i class="fa fa-caret-down"></i>Very High <span class="badge badge-danger badge-pill">14 items</span></p>
-
+                <p class="small-text link" class="btn btn-link" data-toggle="collapse" id="todo-list-very"><i class="fa fa-caret-down"></i>Very High <span class="badge badge-danger badge-pill">14 items</span></p>
+                <div id="todo-list-very-hiddenlist"></div>
             </div>
             <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link"><i class="fa fa-caret-down"></i>High <span class="badge badge-warning badge-pill">5 items</span></p>
-
+                <p class="small-text link" class="btn btn-link" id="todo-list-high"><i class="fa fa-caret-down"></i>High <span class="badge badge-warning badge-pill">5 items</span></p>
+                <div id="todo-list-high-hiddenlist"></div>
             </div>
             <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link"><i class="fa fa-caret-down"></i>Normal <span class="badge badge-primary badge-pill">No items</span></p>
+                <p class="small-text link" class="btn btn-link" id="todo-list-normal"><i class="fa fa-caret-down"></i>Normal <span class="badge badge-primary badge-pill">No items</span></p>
+                <div id="todo-list-normal-hiddenlist"></div>
             </div>
             <div class="small-spacer"></div>
             <p class="card-text "> <i class="fa fa-check-circle"></i>Categorized By Date</p>
