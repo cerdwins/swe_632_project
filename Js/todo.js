@@ -1,4 +1,37 @@
 $(document).ready(function() {
+    
+    //updates the categorized very high area and changes the classes 
+    $("#todo-list-very").click(function(){
+        getDataForCategorized("veryhigh");
+        this.first.addClass("fa-caret-right");
+        this.first.removeClass("fa-caret-down");
+    });
+
+    //updates the categorized high area
+    $("#todo-list-high").click(function(){
+        getDataForCategorized("high");
+        this.first.addClass("fa-caret-right");
+        this.first.removeClass("fa-caret-down");
+    });
+
+    //updates the categorized normal area
+    $("#todo-list-normal").click(function(){
+        getDataForCategorized("normal");
+        this.first.addClass("fa-caret-right");
+        this.first.removeClass("fa-caret-down");
+    });
+    
+    //Creates the line items under a given section of the sort area
+    function getDataForCategorized(categorization){
+        var data = [];
+        data = searchByImportance(categorization);
+        $("#todo-list-" + categorization +"-hiddenlist").html("<ul id='" + categorization + "-newlist'></ul>");
+        for(x = 0; x < data.length; x++){
+            var listItem = "<li></li>";
+            $(categorization + "-newlist").append(listItem);
+        }
+    }
+    
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
         format: "MM/dd/yyyy",
@@ -171,5 +204,5 @@ $(document).ready(function() {
         $('#createdAlert').removeClass('hide').addClass('show');
     });
 
-
+ 
 });
