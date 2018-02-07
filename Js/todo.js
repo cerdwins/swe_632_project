@@ -31,7 +31,7 @@ $(document).ready(function() {
             $(categorization + "-newlist").append(listItem);
         }
     }
-    
+
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
         format: "MM/dd/yyyy",
