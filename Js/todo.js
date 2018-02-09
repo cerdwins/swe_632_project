@@ -2,24 +2,40 @@ $(document).ready(function() {
     
     //updates the categorized very high area and changes the classes 
     $("#todo-list-very").click(function(){
+        var classes = this.firstChild.className;
+        if (classes == "fa fa-caret-right"){
+            this.firstChild.className = "fa fa-caret-down";
+        }
+        else{
+            this.firstChild.className = "fa fa-caret-right";
+        }
         getDataForCategorized("veryhigh");
-        this.firstChild.className = "fa fa-caret-right";
     });
 
     //updates the categorized high area
     $("#todo-list-high").click(function(){
+        var classes = this.firstChild.className;
+        if (classes == "fa fa-caret-right"){
+            this.firstChild.className = "fa fa-caret-down";
+        }
+        else{
+            this.firstChild.className = "fa fa-caret-right";
+        }
         getDataForCategorized("high");
-        this.firstChild.className = "fa fa-caret-right";
     });
 
     //updates the categorized normal area
     $("#todo-list-normal").click(function(){
+        var classes = this.firstChild.className;
+        if (classes == "fa fa-caret-right"){
+            this.firstChild.className = "fa fa-caret-down";
+        }
+        else{
+            this.firstChild.className = "fa fa-caret-right";
+        }
         getDataForCategorized("normal");
-        this.firstChild.className = "fa fa-caret-right";
     });
     
-    
-
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
         format: "MM/dd/yyyy",
@@ -84,7 +100,8 @@ function displayCalendarValue(val) {
 //When calendar value changes, change the dates as well
 function calendarChange() {
     dateSelected = toMMDDYYYY(this.value());
-    displayCalendarValue(dateSelected)
+    displayCalendarValue(dateSelected);
+    $("#selected_date").html("Date currently selected on the calendar is: <strong >" + dateSelected + "</strong>");
 }
 
 //Class to create todo Object
