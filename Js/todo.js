@@ -35,6 +35,69 @@ $(document).ready(function() {
         }
         getDataForCategorized("normal");
     });
+
+    //updates the categorized by date areas of today
+    $("#cat-today").click(function(){
+        var classes = this.firstChild.className;
+        if (classes == "fa fa-caret-right"){
+            this.firstChild.className = "fa fa-caret-down";
+        }
+        else{
+            this.firstChild.className = "fa fa-caret-right";
+        }
+        getDataForCategorized("normal");
+    });
+
+
+    //updates the categorized by date areas of this week
+    $("#cat-thisweek").click(function(){
+        var classes = this.firstChild.className;
+        if (classes == "fa fa-caret-right"){
+            this.firstChild.className = "fa fa-caret-down";
+        }
+        else{
+            this.firstChild.className = "fa fa-caret-right";
+        }
+        getDataForCategorized("normal");
+    });
+
+    //updates the categorized by date areas of next week
+    $("#cat-nextweek").click(function(){
+        var classes = this.firstChild.className;
+        if (classes == "fa fa-caret-right"){
+            this.firstChild.className = "fa fa-caret-down";
+        }
+        else{
+            this.firstChild.className = "fa fa-caret-right";
+        }
+        getDataForCategorized("normal");
+    });
+
+//updates the categorized by date areas of next week
+$("#cat-thismonth").click(function(){
+    var classes = this.firstChild.className;
+    if (classes == "fa fa-caret-right"){
+        this.firstChild.className = "fa fa-caret-down";
+    }
+    else{
+        this.firstChild.className = "fa fa-caret-right";
+    }
+    getDataForCategorized("normal");
+});
+
+
+//updates the categorized normal area
+$("#todo-list-normal").click(function(){
+    var classes = this.firstChild.className;
+    if (classes == "fa fa-caret-right"){
+        this.firstChild.className = "fa fa-caret-down";
+    }
+    else{
+        this.firstChild.className = "fa fa-caret-right";
+    }
+    getDataForCategorized("normal");
+});
+
     
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
