@@ -1,5 +1,10 @@
 $(document).ready(function() {
     
+    //moves something to the completed bin or the uncompleted bin
+    $(".form-check-input").is(':checked', function() {
+        
+    });
+
     //updates the categorized very high area and changes the classes 
     $("#todo-list-very").click(function(){
         var classes = this.firstChild.className;
@@ -157,7 +162,7 @@ function createLineItemInToDoList(data){
     if(data.isCompleted){
         var html ='<li class="list-group-item highList">' +
         '           <label class="form-check-label completed-item">' +
-                    '<input type="checkbox" class="form-check-input" value="' + data.importance + '" checked>' + data.name +
+                    '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" value="' + data.importance + '" checked>' + data.name +
                     '</label>' +
                     '<i class="fa fa-trash float-right trash"></i>' + 
                     '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
@@ -166,7 +171,7 @@ function createLineItemInToDoList(data){
     }else{
         var html ='<li class="list-group-item highList">' +
                     '<label class="form-check-label">' +
-                    '<input type="checkbox" class="form-check-input" value="' + data.importance + '">' + data.name +
+                    '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" value="' + data.importance + '">' + data.name +
                     '</label>' +
                     '<i class="fa fa-trash float-right trash"></i>' + 
                     '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
