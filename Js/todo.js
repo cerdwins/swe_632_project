@@ -1,5 +1,8 @@
 $(document).ready(function() {
+    //moves something to the completed bin or the uncompleted bin
+    $(".form-check-input").is(':checked', function() {
 
+    });
     //updates the categorized very high area and changes the classes 
     $("#todo-list-very").click(function(){
         var classes = this.firstChild.className;
@@ -136,22 +139,68 @@ $(document).ready(function() {
         addToDoList(name, dueDate, importance, false);
         //reload the entire page
         $('#createdAlert').removeClass('hide').addClass('show');
+        rapidRefresh();
     });
 
-    showToDoList(); //fills up the currentToDoList area.
+    rapidRefresh();
 
 });
+
+//updates and refreshes the todo list
+function rapidRefresh(){
+    emptyToDoList();
+    showToDoList();
+    updateToDoCounts()
+    initialLateStateVariables();  //intializes the variables that are only now available
+}
+
+
+
+//moves something to the completed bin or the uncompleted bin
+function initialLateStateVariables(){
+    $(".form-check-input").change(function(){
+        var id = $(this).data("internalid");
+        changeStatusOfAToDo(id);
+        rapidRefresh();
+    });
+    $(".trash").click(function(){
+        var correctNode = this.parentElement.children[0].children[0];
+        var id = $(correctNode).data("internalid");
+        deleteItem(id);
+        rapidRefresh();
+    })
+}
+
+//updates the counts above the ToDo list
+function updateToDoCounts(){
+    var data = showData();
+    if(data != null){
+        var completedData = data.items.filter(element => element.isCompleted == true);
+        document.getElementById("completed-badge").innerText = completedData.length;
+        document.getElementById("uncompleted-badge").innerText = data.items.length - completedData.length;
+    }
+    else{
+        document.getElementById("completed-badge").innerText = 0;
+        document.getElementById("uncompleted-badge").innerText = 0;
+    }
+}
+
+
+//empties the ToDo List
+function emptyToDoList(){
+    $("#notCompleted").empty();
+    $("#completedList").empty();
+}
 
 var VERY_HIGH_IMPORTANCE = 'Very High', HIGH_IMPORTANCE = 'High', NORMAL_IMPORTANCE = 'Normal';
 
 //Creates the lists in the "Most Recent Todo Lists" area
 function showToDoList(){
     var currentData = showData();
-    if (currentData) {
+    if(currentData != null){
         for(i = 0; i < currentData.items.length; i++){
             createLineItemInToDoList(currentData.items[i]);
         }
-
     }
 }
 
@@ -161,17 +210,17 @@ function createLineItemInToDoList(data){
     data.dueDate = splitted[0];
     if(data.isCompleted){
         var html ='<li class="list-group-item highList">' +
-        '           <label class="form-check-label completed-item">' +
-                    '<input type="checkbox" class="form-check-input" value="' + data.importance + '" checked>' + data.name +
+                    '<label class="form-check-label completed-item">' +
+                    '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '" checked>' + data.name +
                     '</label>' +
                     '<i class="fa fa-trash float-right trash"></i>' + 
                     '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
                     '</li>';
-        $("#list-group").append(html);
+        $("#completedList").append(html);
     }else{
         var html ='<li class="list-group-item highList">' +
                     '<label class="form-check-label">' +
-                    '<input type="checkbox" class="form-check-input" value="' + data.importance + '">' + data.name +
+                    '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '">' + data.name +
                     '</label>' +
                     '<i class="fa fa-trash float-right trash"></i>' + 
                     '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
@@ -277,7 +326,6 @@ function changeStatusOfAToDo(id) {
 function searchByImportance(importance) {
     var result = [];
     var currentData = showData();
-    console.log('currentData', currentData );
     if (currentData) {
         if (currentData.index > 0) {
             result = currentData.items.filter(filterByImportance(currentData.items, importance.toLowerCase()));
@@ -313,7 +361,7 @@ function deleteItem(id) {
             localStorage.clear();
         } else {
             currentData.index -= 1;
-            currentData.items = removeItemFromArray(currentData.items, currentData.index);
+            currentData.items = removeItemFromArray(currentData.items, id);
             setDataToLocalStorage(currentData);
         }
 
@@ -321,7 +369,7 @@ function deleteItem(id) {
 }
 //Utility methods- this will return a new array
 function removeItemFromArray(array, index) {
-    return array.filter(e => e !== array[index]);
+    return array.filter(e => e !== array[index - 1]);
 }
 
 /*************DATE UTILITIES************/

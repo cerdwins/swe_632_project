@@ -134,16 +134,16 @@
                     <div id="display-todo" class="col-sm-8">
                         <ul class="nav nav-tabs">
                             <li class="nav-item">
-                                <a class="nav-link active" data-toggle="tab" href="#completed">Completed <span class="badge badge-primary badge-pill">14</span></a>
+                                <a class="nav-link active" data-toggle="tab" href="#completed">Completed <span class="badge badge-primary badge-pill" id="completed-badge">0</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#notCompleted">Not completed <span class="badge badge-danger badge-pill">2</span></a>
+                                <a class="nav-link" data-toggle="tab" href="#notCompleted">Not completed <span class="badge badge-danger badge-pill" id="uncompleted-badge">0</span></a>
                             </li>
                         </ul>
                         <!--This is where the actual data will go-->
                         <div class="tab-content">
                             <div class="tab-pane active container" id="completed">
-                                <ul class="list-group">
+                                <ul class="list-group" id="completedList">
                                     <!--
                                     <li class="list-group-item highList">
                                         <label class="form-check-label completed-item">
