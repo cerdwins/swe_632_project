@@ -32,32 +32,50 @@
             <div class="small-spacer"></div>
             <h2>TODO LISTS</h2>
             <div class="small-spacer"></div>
-            <p class="card-text "><i class="fa fa-exclamation-circle"></i>Categorized By Importance</p>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link" data-toggle="collapse" id="todo-list-very"><i class="fa fa-caret-down"></i>Very High <span class="badge badge-danger badge-pill">14 items</span></p>
-                <div id="todo-list-very-hiddenlist"></div>
-            </div>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link" id="todo-list-high"><i class="fa fa-caret-down"></i>High <span class="badge badge-warning badge-pill">5 items</span></p>
-                <div id="todo-list-high-hiddenlist"></div>
-            </div>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link" id="todo-list-normal"><i class="fa fa-caret-down"></i>Normal <span class="badge badge-primary badge-pill">No items</span></p>
-                <div id="todo-list-normal-hiddenlist"></div>
+            <div id="categorized-by-importance">
+                <p class="card-text "><i class="fa fa-exclamation-circle"></i>Categorized By Importance</p>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" data-toggle="collapse" id="todo-list-very">
+                        <i class="fa fa-caret-down"></i>Very High <span class="badge badge-danger badge-pill" data-bind="text: totalVeryHigh"></span>
+                    </p>
+                    <div id="todo-list-very-hiddenlist"></div>
+                </div>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="todo-list-high">
+                        <i class="fa fa-caret-down"></i>High <span class="badge badge-warning badge-pill" data-bind="text: totalHigh"></span>
+                    </p>
+                    <div id="todo-list-high-hiddenlist"></div>
+                </div>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="todo-list-normal">
+                        <i class="fa fa-caret-down"></i>Normal <span class="badge badge-primary badge-pill" data-bind="text: totalNormal"></span>
+                    </p>
+                    <div id="todo-list-normal-hiddenlist"></div>
+                </div>
             </div>
             <div class="small-spacer"></div>
-            <p class="card-text "> <i class="fa fa-check-circle"></i>Categorized By Date</p>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link" id="cat-today"><i class="fa fa-caret-down"></i>Today <span class="badge badge-primary badge-pill">10 items</span></p>
-            </div>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link" id="cat-thisweek"><i class="fa fa-caret-down"></i>This Week <span class="badge badge-primary badge-pill">4 items</span></p>
-            </div>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link" id="cat-nextweek"><i class="fa fa-caret-down"></i>Next Week <span class="badge badge-primary badge-pill">1 item</span></p>
-            </div>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link" id="cat-thismonth"><i class="fa fa-caret-down"></i>This Month <span class="badge badge-primary badge-pill">5 Items</span></p>
+            <div id="categorized-by-date">
+                <p class="card-text "> <i class="fa fa-check-circle"></i>Categorized By Date</p>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="cat-today">
+                        <i class="fa fa-caret-down"></i>Today <span class="badge badge-primary badge-pill" data-bind="text: today"></span>
+                    </p>
+                </div>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="cat-thisweek">
+                        <i class="fa fa-caret-down"></i>This Week <span class="badge badge-primary badge-pill" data-bind="text: thisWeek"></span>
+                    </p>
+                </div>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="cat-nextweek">
+                        <i class="fa fa-caret-down"></i>Next Week <span class="badge badge-primary badge-pill" data-bind="text: nextWeek"></span>
+                    </p>
+                </div>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="cat-thismonth">
+                        <i class="fa fa-caret-down"></i>This Month <span class="badge badge-primary badge-pill" data-bind="text: thisMonth"></span>
+                    </p>
+                </div>
             </div>
             <p class="card-text"><i class="fa fa-search"></i>Custom Search</p>
             <span>From:</span>

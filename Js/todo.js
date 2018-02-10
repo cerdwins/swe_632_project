@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    
+
     //updates the categorized very high area and changes the classes 
     $("#todo-list-very").click(function(){
         var classes = this.firstChild.className;
@@ -73,30 +73,30 @@ $(document).ready(function() {
         getDataForCategorized("normal");
     });
 
-//updates the categorized by date areas of next week
-$("#cat-thismonth").click(function(){
-    var classes = this.firstChild.className;
-    if (classes == "fa fa-caret-right"){
-        this.firstChild.className = "fa fa-caret-down";
-    }
-    else{
-        this.firstChild.className = "fa fa-caret-right";
-    }
-    getDataForCategorized("normal");
-});
+    //updates the categorized by date areas of next week
+    $("#cat-thismonth").click(function(){
+        var classes = this.firstChild.className;
+        if (classes == "fa fa-caret-right"){
+            this.firstChild.className = "fa fa-caret-down";
+        }
+        else{
+            this.firstChild.className = "fa fa-caret-right";
+        }
+        getDataForCategorized("normal");
+    });
 
 
-//updates the categorized normal area
-$("#todo-list-normal").click(function(){
-    var classes = this.firstChild.className;
-    if (classes == "fa fa-caret-right"){
-        this.firstChild.className = "fa fa-caret-down";
-    }
-    else{
-        this.firstChild.className = "fa fa-caret-right";
-    }
-    getDataForCategorized("normal");
-});
+    //updates the categorized normal area
+    $("#todo-list-normal").click(function(){
+        var classes = this.firstChild.className;
+        if (classes == "fa fa-caret-right"){
+            this.firstChild.className = "fa fa-caret-down";
+        }
+        else{
+            this.firstChild.className = "fa fa-caret-right";
+        }
+        getDataForCategorized("normal");
+    });
 
     
     // create Calendar from div HTML element
@@ -142,11 +142,16 @@ $("#todo-list-normal").click(function(){
 
 });
 
+var VERY_HIGH_IMPORTANCE = 'Very High', HIGH_IMPORTANCE = 'High', NORMAL_IMPORTANCE = 'Normal';
+
 //Creates the lists in the "Most Recent Todo Lists" area
 function showToDoList(){
     var currentData = showData();
-    for(i = 0; i < currentData.items.length; i++){
-        createLineItemInToDoList(currentData.items[i]);
+    if (currentData) {
+        for(i = 0; i < currentData.items.length; i++){
+            createLineItemInToDoList(currentData.items[i]);
+        }
+
     }
 }
 
@@ -267,10 +272,12 @@ function changeStatusOfAToDo(id) {
     }
 
 }
+
 //search for an item by importance
 function searchByImportance(importance) {
     var result = [];
     var currentData = showData();
+    console.log('currentData', currentData );
     if (currentData) {
         if (currentData.index > 0) {
             result = currentData.items.filter(filterByImportance(currentData.items, importance.toLowerCase()));
@@ -323,3 +330,83 @@ function toMMDDYYYY(date) {
     var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
     return dateInMMDDYYYY;
 }
+
+(function() {
+    var currentData = showData();
+    var dataSource = new kendo.data.DataSource({
+        data: currentData.items,
+        schema: {
+            model: {
+                id: 'id',
+                fields: {
+                    id : {
+                        type: 'number'
+                    },
+                    name: {
+                        type: 'string'
+                    },
+                    dueDate: {
+                        type: 'date'
+                    },
+                    importance: {
+                        type: 'string'
+                    },
+                    isCompleted: {
+                        type: 'boolean'
+                    }
+                }
+            }
+        },
+        group: {
+            field: 'importance',
+            aggregates: [{ field: 'importance', aggregate: 'count' }]
+        }
+    });
+
+    dataSource.read();
+    var view = dataSource.view();
+    var formatItems = function(count) {
+        if (count) {
+            return count > 1 ? count + ' items' : '1 item';
+        }
+        return 'No items';
+    };
+
+    console.log(view);
+    console.log(currentData.items);
+
+    var aggregateCountByType = function(type) {
+        return formatItems(view.find(function(item) { return item.value === type; }).aggregates.importance.count);
+    };
+
+    dataSource.query({
+        filter: {
+            field: 'importance',
+            operator: function(importance) {
+                return importance === HIGH_IMPORTANCE;
+            }
+        }
+    }).then(function(data) {
+        console.log('data', data);
+        console.log('data', dataSource.view());
+
+    });
+
+    var byImportance = kendo.observable({
+        totalHigh: aggregateCountByType(HIGH_IMPORTANCE),
+        totalVeryHigh: aggregateCountByType(VERY_HIGH_IMPORTANCE),
+        totalNormal: aggregateCountByType(NORMAL_IMPORTANCE)
+    });
+
+    var byDate = kendo.observable({
+        today: aggregateCountByType(HIGH_IMPORTANCE),
+        thisWeek: aggregateCountByType(VERY_HIGH_IMPORTANCE),
+        nextWeek: aggregateCountByType(NORMAL_IMPORTANCE),
+        thisMonth: aggregateCountByType(NORMAL_IMPORTANCE)
+    });
+
+    kendo.bind($('#categorized-by-importance'), byImportance);
+
+    kendo.bind($('#categorized-by-date'), byDate);
+
+}());
