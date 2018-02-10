@@ -132,7 +132,7 @@ $("#todo-list-normal").click(function(){
         var dueDate = dateSelected;
         var formData = $(this).serializeArray();
         var name = formData[0].value;
-        var importance = formData[1].value;
+        var importance = formData[0].value;
         addToDoList(name, dueDate, importance, false);
         //reload the entire page
         $('#createdAlert').removeClass('hide').addClass('show');
