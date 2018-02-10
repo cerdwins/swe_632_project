@@ -179,13 +179,8 @@ function createLineItemInToDoList(data){
     data.dueDate = splitted[0];
     if(data.isCompleted){
         var html ='<li class="list-group-item highList">' +
-<<<<<<< HEAD
-        '           <label class="form-check-label completed-item">' +
-                    '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" value="' + data.importance + '" checked>' + data.name +
-=======
                     '<label class="form-check-label completed-item">' +
                     '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '" checked>' + data.name +
->>>>>>> ee09a8b1d6bb29118a9f0f61e7e4e656c21e4769
                     '</label>' +
                     '<i class="fa fa-trash float-right trash"></i>' + 
                     '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
@@ -194,11 +189,7 @@ function createLineItemInToDoList(data){
     }else{
         var html ='<li class="list-group-item highList">' +
                     '<label class="form-check-label">' +
-<<<<<<< HEAD
-                    '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" value="' + data.importance + '">' + data.name +
-=======
                     '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '">' + data.name +
->>>>>>> ee09a8b1d6bb29118a9f0f61e7e4e656c21e4769
                     '</label>' +
                     '<i class="fa fa-trash float-right trash"></i>' + 
                     '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
