@@ -124,13 +124,13 @@ $("#todo-list-normal").click(function(){
     var dateSelected = calendar.current();
     displayCalendarValue(toMMDDYYYY(dateSelected));
 
-    
+
     //When an item is created
-    $('#createForm').submit(function(event) {
+    $('#create-todo-item').click(function(event) {
         event.preventDefault();
         //Gather form data
         var dueDate = dateSelected;
-        var formData = $(this).serializeArray();
+        var formData = $('#create-todo-item-form').serializeArray();
         var name = formData[0].value;
         var importance = formData[0].value;
         addToDoList(name, dueDate, importance, false);
