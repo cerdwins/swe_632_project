@@ -139,8 +139,26 @@ $("#todo-list-normal").click(function(){
     });
 
     showToDoList(); //fills up the currentToDoList area.
-
+    initialLateStateVariables();  //intializes the variables that are only now available
 });
+
+
+//moves something to the completed bin or the uncompleted bin
+function initialLateStateVariables(){
+    $(".form-check-input").change(function(){
+        var id = $(this).data("internalid");
+        changeStatusOfAToDo(id);
+        emptyToDoList();
+        showToDoList();
+        initialLateStateVariables();
+    });
+}
+
+//empties the ToDo List
+function emptyToDoList(){
+    $("#notCompleted").empty();
+    $("#completedList").empty();
+}
 
 //Creates the lists in the "Most Recent Todo Lists" area
 function showToDoList(){
@@ -156,17 +174,17 @@ function createLineItemInToDoList(data){
     data.dueDate = splitted[0];
     if(data.isCompleted){
         var html ='<li class="list-group-item highList">' +
-        '           <label class="form-check-label completed-item">' +
-                    '<input type="checkbox" class="form-check-input" value="' + data.importance + '" checked>' + data.name +
+                    '<label class="form-check-label completed-item">' +
+                    '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '" checked>' + data.name +
                     '</label>' +
                     '<i class="fa fa-trash float-right trash"></i>' + 
                     '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
                     '</li>';
-        $("#list-group").append(html);
+        $("#completedList").append(html);
     }else{
         var html ='<li class="list-group-item highList">' +
                     '<label class="form-check-label">' +
-                    '<input type="checkbox" class="form-check-input" value="' + data.importance + '">' + data.name +
+                    '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '">' + data.name +
                     '</label>' +
                     '<i class="fa fa-trash float-right trash"></i>' + 
                     '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
