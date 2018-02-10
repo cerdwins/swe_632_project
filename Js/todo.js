@@ -131,16 +131,49 @@ $("#todo-list-normal").click(function(){
         //Gather form data
         var dueDate = dateSelected;
         var formData = $('#create-todo-item-form').serializeArray();
-        var name = formData[0].value;
+        var name = document.getElementById("simple-input").value
         var importance = formData[0].value;
         addToDoList(name, dueDate, importance, false);
         //reload the entire page
         $('#createdAlert').removeClass('hide').addClass('show');
     });
 
- 
+    showToDoList(); //fills up the currentToDoList area.
+
 });
 
+//Creates the lists in the "Most Recent Todo Lists" area
+function showToDoList(){
+    var currentData = showData();
+    for(i = 0; i < currentData.items.length; i++){
+        createLineItemInToDoList(currentData.items[i]);
+    }
+}
+
+//Creates a line item in the #list-group.  Use 1 Array Json Value
+function createLineItemInToDoList(data){
+    var splitted = data.dueDate.split(":");
+    data.dueDate = splitted[0];
+    if(data.isCompleted){
+        var html ='<li class="list-group-item highList">' +
+        '           <label class="form-check-label completed-item">' +
+                    '<input type="checkbox" class="form-check-input" value="' + data.importance + '" checked>' + data.name +
+                    '</label>' +
+                    '<i class="fa fa-trash float-right trash"></i>' + 
+                    '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
+                    '</li>';
+        $("#list-group").append(html);
+    }else{
+        var html ='<li class="list-group-item highList">' +
+                    '<label class="form-check-label">' +
+                    '<input type="checkbox" class="form-check-input" value="' + data.importance + '">' + data.name +
+                    '</label>' +
+                    '<i class="fa fa-trash float-right trash"></i>' + 
+                    '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
+                    '</li>';
+        $("#notCompleted").append(html);
+    }  
+}
 
 
 //Creates the line items under a given section of the sort area
