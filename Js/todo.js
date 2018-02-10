@@ -141,11 +141,21 @@ $("#todo-list-normal").click(function(){
         addToDoList(name, dueDate, importance, false);
         //reload the entire page
         $('#createdAlert').removeClass('hide').addClass('show');
+        rapidRefresh();
     });
 
-    showToDoList(); //fills up the currentToDoList area.
-    initialLateStateVariables();  //intializes the variables that are only now available
+    rapidRefresh();
+        
 });
+
+//updates and refreshes the todo list
+function rapidRefresh(){
+    emptyToDoList();
+    showToDoList();
+    updateToDoCounts()
+    initialLateStateVariables();  //intializes the variables that are only now available
+}
+
 
 
 //moves something to the completed bin or the uncompleted bin
@@ -153,11 +163,30 @@ function initialLateStateVariables(){
     $(".form-check-input").change(function(){
         var id = $(this).data("internalid");
         changeStatusOfAToDo(id);
-        emptyToDoList();
-        showToDoList();
-        initialLateStateVariables();
+        rapidRefresh();        
     });
+    $(".trash").click(function(){
+        var correctNode = this.parentElement.children[0].children[0];
+        var id = $(correctNode).data("internalid");
+        deleteItem(id);
+        rapidRefresh(); 
+    })
 }
+
+//updates the counts above the ToDo list
+function updateToDoCounts(){
+    var data = showData();
+    if(data != null){
+        var completedData = data.items.filter(element => element.isCompleted == true);
+        document.getElementById("completed-badge").innerText = completedData.length;
+        document.getElementById("uncompleted-badge").innerText = data.items.length - completedData.length;
+    }
+    else{
+        document.getElementById("completed-badge").innerText = 0;
+        document.getElementById("uncompleted-badge").innerText = 0;
+    }
+}
+
 
 //empties the ToDo List
 function emptyToDoList(){
@@ -168,8 +197,10 @@ function emptyToDoList(){
 //Creates the lists in the "Most Recent Todo Lists" area
 function showToDoList(){
     var currentData = showData();
-    for(i = 0; i < currentData.items.length; i++){
-        createLineItemInToDoList(currentData.items[i]);
+    if(currentData != null){
+        for(i = 0; i < currentData.items.length; i++){
+            createLineItemInToDoList(currentData.items[i]);
+        }
     }
 }
 
@@ -329,7 +360,7 @@ function deleteItem(id) {
             localStorage.clear();
         } else {
             currentData.index -= 1;
-            currentData.items = removeItemFromArray(currentData.items, currentData.index);
+            currentData.items = removeItemFromArray(currentData.items, id);
             setDataToLocalStorage(currentData);
         }
 
@@ -337,7 +368,7 @@ function deleteItem(id) {
 }
 //Utility methods- this will return a new array
 function removeItemFromArray(array, index) {
-    return array.filter(e => e !== array[index]);
+    return array.filter(e => e !== array[index - 1]);
 }
 
 /*************DATE UTILITIES************/
