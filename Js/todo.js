@@ -131,18 +131,6 @@ function createLineItemInToDoList(data){
     }  
 }
 
-//Creates the line items under a given section of the sort area
-function getDataForCategorized(categorization){
-    return;
-    var data = [];
-    data = searchByImportance(categorization);
-    $("#todo-list-" + categorization +"-hiddenlist").html("<ul id='" + categorization + "-newlist'></ul>");
-    for(x = 0; x < data.length; x++){
-        var listItem = "<li></li>";
-        $(categorization + "-newlist").append(listItem);
-    }
-}
-
 //to Display the value of the calendar on the text
 function displayCalendarValue(val) {
     var selecteDateId = "#selectedDate";
@@ -221,40 +209,8 @@ function changeStatusOfAToDo(id) {
             setDataToLocalStorage(currentData);
         }
     }
-
 }
 
-//search for an item by importance
-function searchByImportance(importance) {
-    var result = [];
-    var currentData = showData();
-    if (currentData) {
-        if (currentData.index > 0) {
-            result = currentData.items.filter(filterByImportance(currentData.items, importance.toLowerCase()));
-        }
-    }
-    return result;
-}
-
-//utility for importance search
-function filterByImportance(data, importance) {
-    if (importance == "normal") {
-        return data.importance == "normal";
-    } else if (importance == "high") {
-        return data.importance == "high";
-    } else if (importance == "veryhigh") {
-        return data.importance == "veryhigh";
-    } else {
-        return data;
-    }
-
-}
-//search by dates
-function searchByDates(fromDate, toDate) {
-    var result = [];
-    //not implemented yet
-    return result;
-}
 //Delete item from the storage
 function deleteItem(id) {
     var currentData = showData();
@@ -281,7 +237,7 @@ function toMMDDYYYY(date) {
     return dateInMMDDYYYY;
 }
 
-(function() {
+var categorizedItems = (function() {
     var formatItems = function(count) {
         if (count) {
             return count > 1 ? count + ' items' : '1 item';
@@ -434,4 +390,12 @@ function toMMDDYYYY(date) {
     kendo.bind($('#categorized-by-importance'), byImportance);
     kendo.bind($('#categorized-by-date'), byDate);
 
+    return {
+        addItem: function(item) {
+            console.log('addItem');
+        },
+        removeItem: function(item) {
+            console.log('removeItem');
+        }
+    }
 }());
