@@ -188,17 +188,18 @@ function showData() {
 }
 //change from completedToNotCompletedAndViceVersa
 function changeStatusOfAToDo(id) {
+    var i, len;
     //Search for the items
     var currentData = showData();
-    if (currentData) {
-        //Check to see if there is any item in the storage
-        if (currentData.index > 0) {
-            if (currentData.items[id - 1].isCompleted) {
-                currentData.items[id - 1].isCompleted = false;
-            } else {
-                currentData.items[id - 1].isCompleted = true;
+    //Check to see if there is any item in the storage
+    if (currentData && currentData.index > 0) {
+        for (i = 0, len = currentData.items.length; i < len; i++) {
+            var item = currentData.items[i];
+            if (item.id === id) {
+                item.isCompleted = ! item.isCompleted;
+                setDataToLocalStorage(currentData);
+                break;
             }
-            setDataToLocalStorage(currentData);
         }
     }
 }
@@ -210,7 +211,6 @@ function deleteItem(id) {
         if (currentData.index == 1) {
             localStorage.clear();
         } else {
-            currentData.index -= 1;
             currentData.items = removeItemFromArray(currentData.items, id);
             setDataToLocalStorage(currentData);
         }
@@ -218,8 +218,8 @@ function deleteItem(id) {
     }
 }
 //Utility methods- this will return a new array
-function removeItemFromArray(array, index) {
-    return array.filter(e => e !== array[index - 1]);
+function removeItemFromArray(array, id) {
+    return array.filter(e => e.id !== id);
 }
 
 /*************DATE UTILITIES************/
@@ -235,15 +235,6 @@ var categorizedItems = (function() {
             return count > 1 ? count + ' items' : '1 item';
         }
         return 'No items';
-    };
-
-    var createFilteredDataSource = function(filterDefinition) {
-        return new kendo.data.DataSource({
-            data: currentData.items,
-            schema: { model: dataModel },
-            sort: [{ field: 'dueDate', dir: 'desc' }, { field: 'name', dir: 'asc' }],
-            filter: filterDefinition
-        });
     };
 
     var currentData = showData() || { items: [] };
@@ -280,6 +271,18 @@ var categorizedItems = (function() {
             }
         }
     });
+
+    var dataSources = [];
+    var createFilteredDataSource = function(filterDefinition) {
+        var ds = new kendo.data.DataSource({
+            data: currentData.items,
+            schema: { model: dataModel },
+            sort: [{ field: 'dueDate', dir: 'desc' }, { field: 'name', dir: 'asc' }],
+            filter: filterDefinition
+        });
+        dataSources.push(ds);
+        return ds;
+    };
 
     var createDataSourceByImportance = function(importanceType) {
         return createFilteredDataSource({
@@ -382,11 +385,18 @@ var categorizedItems = (function() {
 
     return {
         addItem: function(item) {
-            console.log('addItem', item);
-            veryHigh.add(item);
+            $.map(dataSources, function(ds) {
+                ds.add(item);
+            });
+            byImportance.trigger('change');
+            byDate.trigger('change');
         },
         removeItem: function(itemId) {
-            console.log('removeItem', itemId);
+            $.map(dataSources, function(ds) {
+                ds.remove(ds.get(itemId));
+            });
+            byImportance.trigger('change');
+            byDate.trigger('change');
         }
     }
 }());
