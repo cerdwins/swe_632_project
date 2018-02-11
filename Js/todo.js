@@ -4,6 +4,21 @@ $(document).ready(function() {
 
     });
 
+    var notification = $('#notification').kendoNotification({
+        position: {
+            top: 30
+        },
+        autoHideAfter: 2000,
+        templates: [
+            {
+                type: 'info',
+                template: $('#notification-template').html()
+            }
+        ],
+        width: 300,
+        height: 50
+    }).data('kendoNotification');
+
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
         value: kendo.date.today(),
@@ -45,6 +60,7 @@ $(document).ready(function() {
         //reload the entire page
         $('#createdAlert').removeClass('hide').addClass('show');
         rapidRefresh();
+        notification.show({ message: 'Your ToDo item has been added' });
     });
 
     rapidRefresh();
@@ -71,6 +87,7 @@ function initialLateStateVariables(){
         var id = $(correctNode).data("internalid");
         deleteItem(id);
         rapidRefresh();
+        $('#notification').data('kendoNotification').show({ message: 'ToDo item has been deleted.' });
     })
 }
 

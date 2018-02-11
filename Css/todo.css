@@ -98,3 +98,8 @@
 .normalList {
     border-left: 3px solid #0984e3 !important;
 }
+
+.k-notification-info {
+    background-color: white;
+    color: #6c5ce7;
+}
