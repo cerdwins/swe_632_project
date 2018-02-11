@@ -172,23 +172,15 @@ function setDataToLocalStorage(data) {
 //Users CRUD operations
 function addToDoList(name, dueDate, importance, isCompleted) {
     //get the local storage data // get the index of the highest item // add to the list //set the localstorage
-    currentData = getDataFromLocalStorage();
-
-    if (!currentData) {
-        var currentData = {
-            index: 0,
-            items: []
-        };
-        currentData.index += 1;
-        var toDo = new Todo(currentData.index, name, dueDate, importance, isCompleted);
-        currentData.items.push(toDo);
-        setDataToLocalStorage(currentData);
-    } else {
-        currentData.index += 1;
-        var toDo = new Todo(currentData.index, name, dueDate, importance, isCompleted);
-        currentData.items.push(toDo);
-        setDataToLocalStorage(currentData);
-    }
+    var currentData = getDataFromLocalStorage() || {
+        index: 0,
+        items: []
+    };
+    currentData.index += 1;
+    var toDo = new Todo(currentData.index, name, dueDate, importance, isCompleted);
+    currentData.items.push(toDo);
+    setDataToLocalStorage(currentData);
+    categorizedItems.addItem(toDo);
 }
 //Display all the items
 function showData() {
@@ -222,7 +214,7 @@ function deleteItem(id) {
             currentData.items = removeItemFromArray(currentData.items, id);
             setDataToLocalStorage(currentData);
         }
-
+        categorizedItems.removeItem(id)
     }
 }
 //Utility methods- this will return a new array
@@ -245,7 +237,16 @@ var categorizedItems = (function() {
         return 'No items';
     };
 
-    var currentData = showData();
+    var createFilteredDataSource = function(filterDefinition) {
+        return new kendo.data.DataSource({
+            data: currentData.items,
+            schema: { model: dataModel },
+            sort: [{ field: 'dueDate', dir: 'desc' }, { field: 'name', dir: 'asc' }],
+            filter: filterDefinition
+        });
+    };
+
+    var currentData = showData() || { items: [] };
 
     kendo.data.binders.slide = kendo.data.Binder.extend({
         refresh: function() {
@@ -281,14 +282,10 @@ var categorizedItems = (function() {
     });
 
     var createDataSourceByImportance = function(importanceType) {
-        return new kendo.data.DataSource({
-            data: currentData.items,
-            schema: { model: dataModel },
-            filter: {
-                field: 'importance',
-                operator: 'eq',
-                value: importanceType
-            }
+        return createFilteredDataSource({
+            field: 'importance',
+            operator: 'eq',
+            value: importanceType
         });
     };
 
@@ -331,14 +328,10 @@ var categorizedItems = (function() {
     });
 
     var createDataSourceByDate = function(rangeStart, rangeEnd) {
-        return new kendo.data.DataSource({
-            data: currentData.items,
-            schema: { model: dataModel },
-            filter: {
-                field: 'dueDate',
-                operator: function(dueDate) {
-                    return dateUtils.isInDateRange(dueDate, rangeStart, rangeEnd);
-                }
+        return createFilteredDataSource({
+            field: 'dueDate',
+            operator: function(dueDate) {
+                return dateUtils.isInDateRange(dueDate, rangeStart, rangeEnd);
             }
         });
     };
@@ -346,9 +339,6 @@ var categorizedItems = (function() {
     var dateUtils = kendo.date;
     var today = dateUtils.today();
     var nextSunday = dateUtils.today();
-    if (nextSunday.getDay() === 0) {
-        nextSunday = dateUtils.addDays(nextSunday, 1);
-    }
     nextSunday = dateUtils.addDays(nextSunday, 7 - nextSunday.getDay());
 
     var byDate = kendo.observable({
@@ -392,10 +382,11 @@ var categorizedItems = (function() {
 
     return {
         addItem: function(item) {
-            console.log('addItem');
+            console.log('addItem', item);
+            veryHigh.add(item);
         },
-        removeItem: function(item) {
-            console.log('removeItem');
+        removeItem: function(itemId) {
+            console.log('removeItem', itemId);
         }
     }
 }());
