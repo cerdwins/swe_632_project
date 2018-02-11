@@ -33,49 +33,93 @@
             <h2>TODO LISTS</h2>
             <div class="small-spacer"></div>
             <div id="categorized-by-importance">
-                <p class="card-text "><i class="fa fa-exclamation-circle"></i>Categorized By Importance</p>
-                <div class="category padding-left-six ">
-                    <p class="small-text link" class="btn btn-link" data-toggle="collapse" id="todo-list-very">
-                        <i class="fa fa-caret-down"></i>Very High <span class="badge badge-danger badge-pill" data-bind="text: totalVeryHigh"></span>
+                <p class="card-text " ><i class="fa fa-exclamation-circle"></i>Categorized By Importance</p>
+                <div class="category padding-left-six " >
+                    <p class="small-text link" class="btn btn-link" data-toggle="collapse" id="todo-list-very"
+                       data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right" ></i>
+                        Very High <span class="badge badge-danger badge-pill" data-bind="text: veryHighTotal"></span>
                     </p>
-                    <div id="todo-list-very-hiddenlist"></div>
+                    <div data-bind="slide: displayVeryHigh">
+                        <ul data-role="listview" class="list-group"
+                            data-bind="source: veryHigh, events: { dataBound: dataBound }"
+                            data-template="by-importance-template"></ul>
+                    </div>
                 </div>
                 <div class="category padding-left-six ">
-                    <p class="small-text link" class="btn btn-link" id="todo-list-high">
-                        <i class="fa fa-caret-down"></i>High <span class="badge badge-warning badge-pill" data-bind="text: totalHigh"></span>
+                    <p class="small-text link" class="btn btn-link" id="todo-list-high"
+                       data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right" ></i>
+                        High <span class="badge badge-warning badge-pill" data-bind="text: highTotal"></span>
                     </p>
-                    <div id="todo-list-high-hiddenlist"></div>
+                    <div data-bind="slide: displayHigh">
+                        <ul data-role="listview" class="list-group"
+                            data-bind="source: high, events: { dataBound: dataBound }"
+                            data-template="by-importance-template"></ul>
+                    </div>
                 </div>
                 <div class="category padding-left-six ">
-                    <p class="small-text link" class="btn btn-link" id="todo-list-normal">
-                        <i class="fa fa-caret-down"></i>Normal <span class="badge badge-primary badge-pill" data-bind="text: totalNormal"></span>
+                    <p class="small-text link" class="btn btn-link" id="todo-list-normal"
+                       data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right" ></i>
+                        Normal <span class="badge badge-primary badge-pill" data-bind="text: normalTotal"></span>
                     </p>
-                    <div id="todo-list-normal-hiddenlist"></div>
+                    <div data-bind="slide: displayNormal">
+                        <ul data-role="listview" class="list-group"
+                            data-bind="source: normal, events: { dataBound: dataBound }"
+                            data-template="by-importance-template" ></ul>
+                    </div>
                 </div>
+                <script type="text/x-kendo-tmpl" id="by-importance-template">
+                    <li class="list-group-item">#: name # <span class="small-text">#: kendo.toString(dueDate, 'd') #</span></li>
+                </script>
             </div>
             <div class="small-spacer"></div>
             <div id="categorized-by-date">
                 <p class="card-text "> <i class="fa fa-check-circle"></i>Categorized By Date</p>
                 <div class="category padding-left-six ">
-                    <p class="small-text link" class="btn btn-link" id="cat-today">
-                        <i class="fa fa-caret-down"></i>Today <span class="badge badge-primary badge-pill" data-bind="text: today"></span>
+                    <p class="small-text link" class="btn btn-link" id="cat-today" data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right"></i>Today <span class="badge badge-primary badge-pill" data-bind="text: todayTotal"></span>
                     </p>
+                    <div data-bind="slide: displayToday">
+                        <ul data-role="listview" class="list-group"
+                            data-bind="source: today, events: { dataBound: dataBound }"
+                            data-template="by-importance-template"></ul>
+                    </div>
                 </div>
                 <div class="category padding-left-six ">
-                    <p class="small-text link" class="btn btn-link" id="cat-thisweek">
-                        <i class="fa fa-caret-down"></i>This Week <span class="badge badge-primary badge-pill" data-bind="text: thisWeek"></span>
+                    <p class="small-text link" class="btn btn-link" id="cat-thisweek" data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right"></i>This Week <span class="badge badge-primary badge-pill" data-bind="text: thisWeekTotal"></span>
                     </p>
+                    <div data-bind="slide: displayThisWeek">
+                        <ul data-role="listview" class="list-group"
+                            data-bind="source: thisWeek, events: { dataBound: dataBound }"
+                            data-template="by-importance-template"></ul>
+                    </div>
                 </div>
                 <div class="category padding-left-six ">
-                    <p class="small-text link" class="btn btn-link" id="cat-nextweek">
-                        <i class="fa fa-caret-down"></i>Next Week <span class="badge badge-primary badge-pill" data-bind="text: nextWeek"></span>
+                    <p class="small-text link" class="btn btn-link" id="cat-nextweek" data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right"></i>Next Week <span class="badge badge-primary badge-pill" data-bind="text: nextWeekTotal"></span>
                     </p>
+                    <div data-bind="slide: displayNextWeek">
+                        <ul data-role="listview" class="list-group"
+                            data-bind="source: nextWeek, events: { dataBound: dataBound }"
+                            data-template="by-importance-template"></ul>
+                    </div>
                 </div>
                 <div class="category padding-left-six ">
-                    <p class="small-text link" class="btn btn-link" id="cat-thismonth">
-                        <i class="fa fa-caret-down"></i>This Month <span class="badge badge-primary badge-pill" data-bind="text: thisMonth"></span>
+                    <p class="small-text link" class="btn btn-link" id="cat-thismonth" data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right"></i>This Month <span class="badge badge-primary badge-pill" data-bind="text: thisMonthTotal"></span>
                     </p>
+                    <div data-bind="slide: displayThisMonth">
+                        <ul data-role="listview" class="list-group"
+                            data-bind="source: thisMonth, events: { dataBound: dataBound }"
+                            data-template="by-importance-template"></ul>
+                    </div>
                 </div>
+                <script type="text/x-kendo-tmpl" id="by-date-template">
+                    <li class="list-group-item">#: name # <span class="small-text">#: kendo.toString(dueDate, 'd') #</span></li>
+                </script>
             </div>
             <p class="card-text"><i class="fa fa-search"></i>Custom Search</p>
             <span>From:</span>
