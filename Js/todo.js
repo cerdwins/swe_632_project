@@ -422,8 +422,8 @@ function toMMDDYYYY(date) {
     };
 
     var veryHigh = createDataSourceByImportance(VERY_HIGH_IMPORTANCE);
-    var high = createDataSourceByImportance(HIGH_IMPORTANCE);
-    var normal = createDataSourceByImportance(NORMAL_IMPORTANCE);
+    var high     = createDataSourceByImportance(HIGH_IMPORTANCE);
+    var normal   = createDataSourceByImportance(NORMAL_IMPORTANCE);
 
     var CARET_RIGHT_CLASS = 'fa-caret-right', CARET_DOWN_CLASS = 'fa-caret-down';
 
@@ -436,9 +436,9 @@ function toMMDDYYYY(date) {
         normalTotal: null,
         toggleList: function(e) {
             var $target = $(e.currentTarget);
-            var displayVeryHigh = $target.is('#todo-list-very') && ! this.displayVeryHigh;
-            var displayHigh = $target.is('#todo-list-high') && ! this.displayHigh;
-            var displayNormal = $target.is('#todo-list-normal') && ! this.displayNormal;
+            var displayVeryHigh = $target.is('#todo-list-very')     && ! this.displayVeryHigh;
+            var displayHigh     = $target.is('#todo-list-high')     && ! this.displayHigh;
+            var displayNormal   = $target.is('#todo-list-normal')   && ! this.displayNormal;
             this.set('displayVeryHigh', displayVeryHigh);
             $('#todo-list-very i').addClass(displayVeryHigh ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
                 .removeClass(displayVeryHigh ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
@@ -474,6 +474,11 @@ function toMMDDYYYY(date) {
 
     var dateUtils = kendo.date;
     var today = dateUtils.today();
+    var nextSunday = dateUtils.today();
+    if (nextSunday.getDay() === 0) {
+        nextSunday = dateUtils.addDays(nextSunday, 1);
+    }
+    nextSunday = dateUtils.addDays(nextSunday, 7 - nextSunday.getDay());
 
     var byDate = kendo.observable({
         displayToday: false,
@@ -482,10 +487,10 @@ function toMMDDYYYY(date) {
         displayThisMonth: false,
         toggleList: function(e) {
             var $target = $(e.currentTarget);
-            var displayToday = $target.is('#cat-today') && ! this.displayToday;
-            var displayThisWeek = $target.is('#cat-thisweek') && ! this.displayThisWeek;
-            var displayNextWeek = $target.is('#cat-nextweek') && ! this.displayNextWeek;
-            var displayThisMonth = $target.is('#cat-thismonth') && ! this.displayThisMonth;
+            var displayToday        = $target.is('#cat-today')      && ! this.displayToday;
+            var displayThisWeek     = $target.is('#cat-thisweek')   && ! this.displayThisWeek;
+            var displayNextWeek     = $target.is('#cat-nextweek')   && ! this.displayNextWeek;
+            var displayThisMonth    = $target.is('#cat-thismonth')  && ! this.displayThisMonth;
             this.set('displayToday', displayToday);
             $('#cat-today i').addClass(displayToday ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
                 .removeClass(displayToday ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
@@ -500,8 +505,8 @@ function toMMDDYYYY(date) {
                 .removeClass(displayThisMonth ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
         },
         today: createDataSourceByDate(today, today),
-        thisWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 7, -1), dateUtils.dayOfWeek(today, 7, 1)),
-        nextWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 7, 1), dateUtils.dayOfWeek(today, 14, 1)),
+        thisWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 0, 1), dateUtils.dayOfWeek(today, 6, 1)),
+        nextWeek: createDataSourceByDate(nextSunday, dateUtils.dayOfWeek(nextSunday, 6, 1)),
         thisMonth: createDataSourceByDate(dateUtils.firstDayOfMonth(today), dateUtils.lastDayOfMonth(today)),
         dataBound: function(e) {
             this.set('todayTotal', formatItems(this.today.total()));
