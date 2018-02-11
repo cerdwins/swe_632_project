@@ -3,91 +3,6 @@ $(document).ready(function() {
     $(".form-check-input").is(':checked', function() {
 
     });
-    //updates the categorized very high area and changes the classes 
-    $("#todo-list-very").click(function(){
-        var classes = this.firstChild.className;
-        if (classes == "fa fa-caret-right"){
-            this.firstChild.className = "fa fa-caret-down";
-        }
-        else{
-            this.firstChild.className = "fa fa-caret-right";
-        }
-        getDataForCategorized("veryhigh");
-    });
-
-    //updates the categorized high area
-    $("#todo-list-high").click(function(){
-        var classes = this.firstChild.className;
-        if (classes == "fa fa-caret-right"){
-            this.firstChild.className = "fa fa-caret-down";
-        }
-        else{
-            this.firstChild.className = "fa fa-caret-right";
-        }
-        getDataForCategorized("high");
-    });
-
-    //updates the categorized normal area
-    $("#todo-list-normal").click(function(){
-        var classes = this.firstChild.className;
-        if (classes == "fa fa-caret-right"){
-            this.firstChild.className = "fa fa-caret-down";
-        }
-        else{
-            this.firstChild.className = "fa fa-caret-right";
-        }
-        getDataForCategorized("normal");
-    });
-
-    //updates the categorized by date areas of today
-    $("#cat-today").click(function(){
-        var classes = this.firstChild.className;
-        if (classes == "fa fa-caret-right"){
-            this.firstChild.className = "fa fa-caret-down";
-        }
-        else{
-            this.firstChild.className = "fa fa-caret-right";
-        }
-        getDataForCategorized("normal");
-    });
-
-
-    //updates the categorized by date areas of this week
-    $("#cat-thisweek").click(function(){
-        var classes = this.firstChild.className;
-        if (classes == "fa fa-caret-right"){
-            this.firstChild.className = "fa fa-caret-down";
-        }
-        else{
-            this.firstChild.className = "fa fa-caret-right";
-        }
-        getDataForCategorized("normal");
-    });
-
-    //updates the categorized by date areas of next week
-    $("#cat-nextweek").click(function(){
-        var classes = this.firstChild.className;
-        if (classes == "fa fa-caret-right"){
-            this.firstChild.className = "fa fa-caret-down";
-        }
-        else{
-            this.firstChild.className = "fa fa-caret-right";
-        }
-        getDataForCategorized("normal");
-    });
-
-    //updates the categorized by date areas of next week
-    $("#cat-thismonth").click(function(){
-        var classes = this.firstChild.className;
-        if (classes == "fa fa-caret-right"){
-            this.firstChild.className = "fa fa-caret-down";
-        }
-        else{
-            this.firstChild.className = "fa fa-caret-right";
-        }
-        getDataForCategorized("normal");
-    });
-
 
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
@@ -216,18 +131,6 @@ function createLineItemInToDoList(data){
     }  
 }
 
-//Creates the line items under a given section of the sort area
-function getDataForCategorized(categorization){
-    return;
-    var data = [];
-    data = searchByImportance(categorization);
-    $("#todo-list-" + categorization +"-hiddenlist").html("<ul id='" + categorization + "-newlist'></ul>");
-    for(x = 0; x < data.length; x++){
-        var listItem = "<li></li>";
-        $(categorization + "-newlist").append(listItem);
-    }
-}
-
 //to Display the value of the calendar on the text
 function displayCalendarValue(val) {
     var selecteDateId = "#selectedDate";
@@ -269,23 +172,15 @@ function setDataToLocalStorage(data) {
 //Users CRUD operations
 function addToDoList(name, dueDate, importance, isCompleted) {
     //get the local storage data // get the index of the highest item // add to the list //set the localstorage
-    currentData = getDataFromLocalStorage();
-
-    if (!currentData) {
-        var currentData = {
-            index: 0,
-            items: []
-        };
-        currentData.index += 1;
-        var toDo = new Todo(currentData.index, name, dueDate, importance, isCompleted);
-        currentData.items.push(toDo);
-        setDataToLocalStorage(currentData);
-    } else {
-        currentData.index += 1;
-        var toDo = new Todo(currentData.index, name, dueDate, importance, isCompleted);
-        currentData.items.push(toDo);
-        setDataToLocalStorage(currentData);
-    }
+    var currentData = getDataFromLocalStorage() || {
+        index: 0,
+        items: []
+    };
+    currentData.index += 1;
+    var toDo = new Todo(currentData.index, name, dueDate, importance, isCompleted);
+    currentData.items.push(toDo);
+    setDataToLocalStorage(currentData);
+    categorizedItems.addItem(toDo);
 }
 //Display all the items
 function showData() {
@@ -306,40 +201,8 @@ function changeStatusOfAToDo(id) {
             setDataToLocalStorage(currentData);
         }
     }
-
 }
 
-//search for an item by importance
-function searchByImportance(importance) {
-    var result = [];
-    var currentData = showData();
-    if (currentData) {
-        if (currentData.index > 0) {
-            result = currentData.items.filter(filterByImportance(currentData.items, importance.toLowerCase()));
-        }
-    }
-    return result;
-}
-
-//utility for importance search
-function filterByImportance(data, importance) {
-    if (importance == "normal") {
-        return data.importance == "normal";
-    } else if (importance == "high") {
-        return data.importance == "high";
-    } else if (importance == "veryhigh") {
-        return data.importance == "veryhigh";
-    } else {
-        return data;
-    }
-
-}
-//search by dates
-function searchByDates(fromDate, toDate) {
-    var result = [];
-    //not implemented yet
-    return result;
-}
 //Delete item from the storage
 function deleteItem(id) {
     var currentData = showData();
@@ -351,7 +214,7 @@ function deleteItem(id) {
             currentData.items = removeItemFromArray(currentData.items, id);
             setDataToLocalStorage(currentData);
         }
-
+        categorizedItems.removeItem(id)
     }
 }
 //Utility methods- this will return a new array
@@ -366,7 +229,7 @@ function toMMDDYYYY(date) {
     return dateInMMDDYYYY;
 }
 
-(function() {
+var categorizedItems = (function() {
     var formatItems = function(count) {
         if (count) {
             return count > 1 ? count + ' items' : '1 item';
@@ -374,7 +237,16 @@ function toMMDDYYYY(date) {
         return 'No items';
     };
 
-    var currentData = showData();
+    var createFilteredDataSource = function(filterDefinition) {
+        return new kendo.data.DataSource({
+            data: currentData.items,
+            schema: { model: dataModel },
+            sort: [{ field: 'dueDate', dir: 'desc' }, { field: 'name', dir: 'asc' }],
+            filter: filterDefinition
+        });
+    };
+
+    var currentData = showData() || { items: [] };
 
     kendo.data.binders.slide = kendo.data.Binder.extend({
         refresh: function() {
@@ -410,20 +282,16 @@ function toMMDDYYYY(date) {
     });
 
     var createDataSourceByImportance = function(importanceType) {
-        return new kendo.data.DataSource({
-            data: currentData.items,
-            schema: { model: dataModel },
-            filter: {
-                field: 'importance',
-                operator: 'eq',
-                value: importanceType
-            }
+        return createFilteredDataSource({
+            field: 'importance',
+            operator: 'eq',
+            value: importanceType
         });
     };
 
     var veryHigh = createDataSourceByImportance(VERY_HIGH_IMPORTANCE);
-    var high = createDataSourceByImportance(HIGH_IMPORTANCE);
-    var normal = createDataSourceByImportance(NORMAL_IMPORTANCE);
+    var high     = createDataSourceByImportance(HIGH_IMPORTANCE);
+    var normal   = createDataSourceByImportance(NORMAL_IMPORTANCE);
 
     var CARET_RIGHT_CLASS = 'fa-caret-right', CARET_DOWN_CLASS = 'fa-caret-down';
 
@@ -436,9 +304,9 @@ function toMMDDYYYY(date) {
         normalTotal: null,
         toggleList: function(e) {
             var $target = $(e.currentTarget);
-            var displayVeryHigh = $target.is('#todo-list-very') && ! this.displayVeryHigh;
-            var displayHigh = $target.is('#todo-list-high') && ! this.displayHigh;
-            var displayNormal = $target.is('#todo-list-normal') && ! this.displayNormal;
+            var displayVeryHigh = $target.is('#todo-list-very')     && ! this.displayVeryHigh;
+            var displayHigh     = $target.is('#todo-list-high')     && ! this.displayHigh;
+            var displayNormal   = $target.is('#todo-list-normal')   && ! this.displayNormal;
             this.set('displayVeryHigh', displayVeryHigh);
             $('#todo-list-very i').addClass(displayVeryHigh ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
                 .removeClass(displayVeryHigh ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
@@ -460,20 +328,18 @@ function toMMDDYYYY(date) {
     });
 
     var createDataSourceByDate = function(rangeStart, rangeEnd) {
-        return new kendo.data.DataSource({
-            data: currentData.items,
-            schema: { model: dataModel },
-            filter: {
-                field: 'dueDate',
-                operator: function(dueDate) {
-                    return dateUtils.isInDateRange(dueDate, rangeStart, rangeEnd);
-                }
+        return createFilteredDataSource({
+            field: 'dueDate',
+            operator: function(dueDate) {
+                return dateUtils.isInDateRange(dueDate, rangeStart, rangeEnd);
             }
         });
     };
 
     var dateUtils = kendo.date;
     var today = dateUtils.today();
+    var nextSunday = dateUtils.today();
+    nextSunday = dateUtils.addDays(nextSunday, 7 - nextSunday.getDay());
 
     var byDate = kendo.observable({
         displayToday: false,
@@ -482,10 +348,10 @@ function toMMDDYYYY(date) {
         displayThisMonth: false,
         toggleList: function(e) {
             var $target = $(e.currentTarget);
-            var displayToday = $target.is('#cat-today') && ! this.displayToday;
-            var displayThisWeek = $target.is('#cat-thisweek') && ! this.displayThisWeek;
-            var displayNextWeek = $target.is('#cat-nextweek') && ! this.displayNextWeek;
-            var displayThisMonth = $target.is('#cat-thismonth') && ! this.displayThisMonth;
+            var displayToday        = $target.is('#cat-today')      && ! this.displayToday;
+            var displayThisWeek     = $target.is('#cat-thisweek')   && ! this.displayThisWeek;
+            var displayNextWeek     = $target.is('#cat-nextweek')   && ! this.displayNextWeek;
+            var displayThisMonth    = $target.is('#cat-thismonth')  && ! this.displayThisMonth;
             this.set('displayToday', displayToday);
             $('#cat-today i').addClass(displayToday ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
                 .removeClass(displayToday ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
@@ -500,8 +366,8 @@ function toMMDDYYYY(date) {
                 .removeClass(displayThisMonth ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
         },
         today: createDataSourceByDate(today, today),
-        thisWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 7, -1), dateUtils.dayOfWeek(today, 7, 1)),
-        nextWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 7, 1), dateUtils.dayOfWeek(today, 14, 1)),
+        thisWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 0, 1), dateUtils.dayOfWeek(today, 6, 1)),
+        nextWeek: createDataSourceByDate(nextSunday, dateUtils.dayOfWeek(nextSunday, 6, 1)),
         thisMonth: createDataSourceByDate(dateUtils.firstDayOfMonth(today), dateUtils.lastDayOfMonth(today)),
         dataBound: function(e) {
             this.set('todayTotal', formatItems(this.today.total()));
@@ -514,4 +380,13 @@ function toMMDDYYYY(date) {
     kendo.bind($('#categorized-by-importance'), byImportance);
     kendo.bind($('#categorized-by-date'), byDate);
 
+    return {
+        addItem: function(item) {
+            console.log('addItem', item);
+            veryHigh.add(item);
+        },
+        removeItem: function(itemId) {
+            console.log('removeItem', itemId);
+        }
+    }
 }());
