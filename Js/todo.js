@@ -6,9 +6,13 @@ $(document).ready(function() {
 
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
+        value: kendo.date.today(),
         format: "MM/dd/yyyy",
-        change: calendarChange
-
+        //When calendar value changes, change the dates as well
+        change: function() {
+            var dateSelected = toMMDDYYYY(this.value());
+            displayCalendarValue(dateSelected);
+        }
     });
     $("#fromDate").kendoDatePicker({
 
@@ -21,7 +25,6 @@ $(document).ready(function() {
         format: "MM/dd/yyyy",
     });
     
-
     /******************EVENT HANDLING PARTS ONLY********************** */
 
     //Display selected date on the calendar on load
@@ -34,7 +37,7 @@ $(document).ready(function() {
     $('#create-todo-item').click(function(event) {
         event.preventDefault();
         //Gather form data
-        var dueDate = dateSelected;
+        var dueDate = calendar.value();
         var formData = $('#create-todo-item-form').serializeArray();
         var name = document.getElementById("simple-input").value
         var importance = formData[0].value;
@@ -55,8 +58,6 @@ function rapidRefresh(){
     updateToDoCounts()
     initialLateStateVariables();  //intializes the variables that are only now available
 }
-
-
 
 //moves something to the completed bin or the uncompleted bin
 function initialLateStateVariables(){
@@ -133,14 +134,7 @@ function createLineItemInToDoList(data){
 
 //to Display the value of the calendar on the text
 function displayCalendarValue(val) {
-    var selecteDateId = "#selectedDate";
-    $(selecteDateId).text(val);
-}
-//When calendar value changes, change the dates as well
-function calendarChange() {
-    dateSelected = toMMDDYYYY(this.value());
-    displayCalendarValue(dateSelected);
-    $("#selected_date").html("Date currently selected on the calendar is: <strong >" + dateSelected + "</strong>");
+    $("#selected-date").text(val);
 }
 
 //Class to create todo Object
@@ -225,8 +219,7 @@ function removeItemFromArray(array, id) {
 /*************DATE UTILITIES************/
 //convert to mm/dd/yyyy
 function toMMDDYYYY(date) {
-    var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
-    return dateInMMDDYYYY;
+    return kendo.toString(date, 'MM/dd/yyyy');
 }
 
 var categorizedItems = (function() {

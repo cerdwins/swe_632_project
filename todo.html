@@ -76,7 +76,7 @@
             </div>
             <div class="small-spacer"></div>
             <div id="categorized-by-date">
-                <p class="card-text "> <i class="fa fa-check-circle"></i>Categorized By Date</p>
+                <p class="card-text "> <i class="fa fa-calendar"></i>Categorized By Date</p>
                 <div class="category padding-left-six ">
                     <p class="small-text link" class="btn btn-link" id="cat-today" data-bind="events: { click: toggleList }">
                         <i class="fa fa-caret-right"></i>Today <span class="badge badge-primary badge-pill" data-bind="text: todayTotal"></span>
@@ -132,7 +132,7 @@
         <div class=" col-sm-9 bg-white padding-all-one scroll ">
             <div class="row">
                 <div class="col-sm-6" id="upper-section">
-                    <h3><i class="fa fa-list-alt"></i> Create a todo List in three simple steps</h3>
+                    <h3><i class="fa fa-list-alt"></i> Create a ToDo list in three simple steps</h3>
                     <div class="small-spacer"></div>
                     <div>
                         <strong><i class="fa fa-check"></i>Step 1</strong>: Pick a Date &nbsp;&nbsp;&nbsp;&nbsp; <strong><i class="fa fa-check"></i>Step 2</strong>: Enter ToDo Item &nbsp; &nbsp;&nbsp;&nbsp; <strong><i class="fa fa-check"></i>Step 3</strong>:
@@ -146,7 +146,9 @@
                     <div class="spacer"></div>
                     <div id="todoItem">
                         <form id="create-todo-item-form">
-                            <p id="selected_date" for="simple-input"><i class="fa fa-calendar"></i>Date currently selected on the calendar is:<strong > 2/3/2018</strong> </p>
+                            <p for="simple-input">
+                                <i class="fa fa-calendar"></i>Currently selected date:<strong id="selected-date"> </strong>
+                            </p>
                             <input id="simple-input" type="text" placeholder="enter your todo item here" class="k-textbox" style="width: 100%;" />
                             <div class="small-spacer"></div>
                             <div class="small-spacer"></div>
@@ -171,7 +173,7 @@
 
             <hr class="featurette-divider">
             <div class="small-spacer"></div>
-            <h4><i class="fa fa-clock"></i>Most Recent Todo Lists</h4>
+            <h4><i class="fa fa-clock"></i>Most Recent ToDo Lists</h4>
             <div id="display-section">
 
                 <div class="row">
