@@ -1,10 +1,8 @@
 $(document).ready(function() {
-    
     //moves something to the completed bin or the uncompleted bin
     $(".form-check-input").is(':checked', function() {
-        
-    });
 
+    });
     //updates the categorized very high area and changes the classes 
     $("#todo-list-very").click(function(){
         var classes = this.firstChild.className;
@@ -78,32 +76,19 @@ $(document).ready(function() {
         getDataForCategorized("normal");
     });
 
-//updates the categorized by date areas of next week
-$("#cat-thismonth").click(function(){
-    var classes = this.firstChild.className;
-    if (classes == "fa fa-caret-right"){
-        this.firstChild.className = "fa fa-caret-down";
-    }
-    else{
-        this.firstChild.className = "fa fa-caret-right";
-    }
-    getDataForCategorized("normal");
-});
+    //updates the categorized by date areas of next week
+    $("#cat-thismonth").click(function(){
+        var classes = this.firstChild.className;
+        if (classes == "fa fa-caret-right"){
+            this.firstChild.className = "fa fa-caret-down";
+        }
+        else{
+            this.firstChild.className = "fa fa-caret-right";
+        }
+        getDataForCategorized("normal");
+    });
 
 
-//updates the categorized normal area
-$("#todo-list-normal").click(function(){
-    var classes = this.firstChild.className;
-    if (classes == "fa fa-caret-right"){
-        this.firstChild.className = "fa fa-caret-down";
-    }
-    else{
-        this.firstChild.className = "fa fa-caret-right";
-    }
-    getDataForCategorized("normal");
-});
-
-    
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
         format: "MM/dd/yyyy",
@@ -145,7 +130,7 @@ $("#todo-list-normal").click(function(){
     });
 
     rapidRefresh();
-        
+
 });
 
 //updates and refreshes the todo list
@@ -163,13 +148,13 @@ function initialLateStateVariables(){
     $(".form-check-input").change(function(){
         var id = $(this).data("internalid");
         changeStatusOfAToDo(id);
-        rapidRefresh();        
+        rapidRefresh();
     });
     $(".trash").click(function(){
         var correctNode = this.parentElement.children[0].children[0];
         var id = $(correctNode).data("internalid");
         deleteItem(id);
-        rapidRefresh(); 
+        rapidRefresh();
     })
 }
 
@@ -193,6 +178,8 @@ function emptyToDoList(){
     $("#notCompleted").empty();
     $("#completedList").empty();
 }
+
+var VERY_HIGH_IMPORTANCE = 'Very High', HIGH_IMPORTANCE = 'High', NORMAL_IMPORTANCE = 'Normal';
 
 //Creates the lists in the "Most Recent Todo Lists" area
 function showToDoList(){
@@ -229,9 +216,9 @@ function createLineItemInToDoList(data){
     }  
 }
 
-
 //Creates the line items under a given section of the sort area
 function getDataForCategorized(categorization){
+    return;
     var data = [];
     data = searchByImportance(categorization);
     $("#todo-list-" + categorization +"-hiddenlist").html("<ul id='" + categorization + "-newlist'></ul>");
@@ -321,6 +308,7 @@ function changeStatusOfAToDo(id) {
     }
 
 }
+
 //search for an item by importance
 function searchByImportance(importance) {
     var result = [];
@@ -377,3 +365,153 @@ function toMMDDYYYY(date) {
     var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
     return dateInMMDDYYYY;
 }
+
+(function() {
+    var formatItems = function(count) {
+        if (count) {
+            return count > 1 ? count + ' items' : '1 item';
+        }
+        return 'No items';
+    };
+
+    var currentData = showData();
+
+    kendo.data.binders.slide = kendo.data.Binder.extend({
+        refresh: function() {
+            var value = this.bindings["slide"].get();
+
+            if (value) {
+                $(this.element).slideDown();
+            } else {
+                $(this.element).slideUp();
+            }
+        }
+    });
+
+    var dataModel = new kendo.data.Model.define({
+        id: 'id',
+        fields: {
+            id : {
+                type: 'number'
+            },
+            name: {
+                type: 'string'
+            },
+            dueDate: {
+                type: 'date'
+            },
+            importance: {
+                type: 'string'
+            },
+            isCompleted: {
+                type: 'boolean'
+            }
+        }
+    });
+
+    var createDataSourceByImportance = function(importanceType) {
+        return new kendo.data.DataSource({
+            data: currentData.items,
+            schema: { model: dataModel },
+            filter: {
+                field: 'importance',
+                operator: 'eq',
+                value: importanceType
+            }
+        });
+    };
+
+    var veryHigh = createDataSourceByImportance(VERY_HIGH_IMPORTANCE);
+    var high = createDataSourceByImportance(HIGH_IMPORTANCE);
+    var normal = createDataSourceByImportance(NORMAL_IMPORTANCE);
+
+    var CARET_RIGHT_CLASS = 'fa-caret-right', CARET_DOWN_CLASS = 'fa-caret-down';
+
+    var byImportance = kendo.observable({
+        veryHigh: veryHigh,
+        veryHighTotal: null,
+        high: high,
+        highTotal: null,
+        normal: normal,
+        normalTotal: null,
+        toggleList: function(e) {
+            var $target = $(e.currentTarget);
+            var displayVeryHigh = $target.is('#todo-list-very') && ! this.displayVeryHigh;
+            var displayHigh = $target.is('#todo-list-high') && ! this.displayHigh;
+            var displayNormal = $target.is('#todo-list-normal') && ! this.displayNormal;
+            this.set('displayVeryHigh', displayVeryHigh);
+            $('#todo-list-very i').addClass(displayVeryHigh ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
+                .removeClass(displayVeryHigh ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            this.set('displayHigh', displayHigh);
+            $('#todo-list-high i').addClass(displayHigh ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
+                .removeClass(displayHigh ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            this.set('displayNormal', displayNormal);
+            $('#todo-list-normal i').addClass(displayNormal ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
+                .removeClass(displayNormal ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+        },
+        displayVeryHigh: false,
+        displayHigh: false,
+        displayNormal: false,
+        dataBound: function(e) {
+            this.set('veryHighTotal', formatItems(this.veryHigh.total()));
+            this.set('highTotal', formatItems(this.high.total()));
+            this.set('normalTotal', formatItems(this.normal.total()));
+        }
+    });
+
+    var createDataSourceByDate = function(rangeStart, rangeEnd) {
+        return new kendo.data.DataSource({
+            data: currentData.items,
+            schema: { model: dataModel },
+            filter: {
+                field: 'dueDate',
+                operator: function(dueDate) {
+                    return dateUtils.isInDateRange(dueDate, rangeStart, rangeEnd);
+                }
+            }
+        });
+    };
+
+    var dateUtils = kendo.date;
+    var today = dateUtils.today();
+
+    var byDate = kendo.observable({
+        displayToday: false,
+        displayThisWeek: false,
+        displayNextWeek: false,
+        displayThisMonth: false,
+        toggleList: function(e) {
+            var $target = $(e.currentTarget);
+            var displayToday = $target.is('#cat-today') && ! this.displayToday;
+            var displayThisWeek = $target.is('#cat-thisweek') && ! this.displayThisWeek;
+            var displayNextWeek = $target.is('#cat-nextweek') && ! this.displayNextWeek;
+            var displayThisMonth = $target.is('#cat-thismonth') && ! this.displayThisMonth;
+            this.set('displayToday', displayToday);
+            $('#cat-today i').addClass(displayToday ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
+                .removeClass(displayToday ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            this.set('displayThisWeek', displayThisWeek);
+            $('#cat-thisweek i').addClass(displayThisWeek ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
+                .removeClass(displayThisWeek ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            this.set('displayNextWeek', displayNextWeek);
+            $('#cat-nextweek i').addClass(displayNextWeek ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
+                .removeClass(displayNextWeek ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            this.set('displayThisMonth', displayThisMonth);
+            $('#cat-thismonth i').addClass(displayThisMonth ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
+                .removeClass(displayThisMonth ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+        },
+        today: createDataSourceByDate(today, today),
+        thisWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 7, -1), dateUtils.dayOfWeek(today, 7, 1)),
+        nextWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 7, 1), dateUtils.dayOfWeek(today, 14, 1)),
+        thisMonth: createDataSourceByDate(dateUtils.firstDayOfMonth(today), dateUtils.lastDayOfMonth(today)),
+        dataBound: function(e) {
+            this.set('todayTotal', formatItems(this.today.total()));
+            this.set('thisWeekTotal', formatItems(this.thisWeek.total()));
+            this.set('nextWeekTotal', formatItems(this.nextWeek.total()));
+            this.set('thisMonthTotal', formatItems(this.thisMonth.total()));
+        }
+    });
+
+    kendo.bind($('#categorized-by-importance'), byImportance);
+    kendo.bind($('#categorized-by-date'), byDate);
+
+}());
