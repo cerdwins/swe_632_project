@@ -127,15 +127,14 @@ function showToDoList(){
 
 //Creates a line item in the #list-group.  Use 1 Array Json Value
 function createLineItemInToDoList(data){
-    var splitted = data.dueDate.split(":");
-    data.dueDate = splitted[0];
+    var dueDate = toMMDDYYYY(new Date(data.dueDate));
     if(data.isCompleted){
         var html ='<li class="list-group-item highList">' +
                     '<label class="form-check-label completed-item">' +
                     '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '" checked>' + data.name +
                     '</label>' +
                     '<i class="fa fa-trash float-right trash"></i>' + 
-                    '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
+                    '<p class="small-text">Due Date: ' + dueDate + '</p>' +
                     '</li>';
         $("#completedList").append(html);
     }else{
@@ -144,7 +143,7 @@ function createLineItemInToDoList(data){
                     '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '">' + data.name +
                     '</label>' +
                     '<i class="fa fa-trash float-right trash"></i>' + 
-                    '<p class="small-text">Due Date: ' + data.dueDate + '</p>' + 
+                    '<p class="small-text">Due Date: ' + dueDate + '</p>' +
                     '</li>';
         $("#notCompleted").append(html);
     }  
@@ -263,7 +262,7 @@ var categorizedItems = (function() {
         }
     });
 
-    var dataModel = new kendo.data.Model.define({
+    var dataModel = kendo.data.Model.define({
         id: 'id',
         fields: {
             id : {
