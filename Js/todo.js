@@ -233,6 +233,7 @@ function changeStatusOfAToDo(id) {
 $("#deleteStorage").click(function() {
     if (confirm("Are you sure you would like to remove all the data?")) {
         localStorage.clear();
+        location.reload();
     }
 
 });
