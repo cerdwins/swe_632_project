@@ -377,7 +377,7 @@ var categorizedItems = (function() {
             toggleCaret($('#cat-thismonth i'), displayThisMonth);
         },
         today: createDataSourceByDate(today, today),
-        thisWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 0, 1), dateUtils.dayOfWeek(today, 6, 1)),
+        thisWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 0, -1), dateUtils.dayOfWeek(today, 6, 1)),
         nextWeek: createDataSourceByDate(nextSunday, dateUtils.dayOfWeek(nextSunday, 6, 1)),
         thisMonth: createDataSourceByDate(dateUtils.firstDayOfMonth(today), dateUtils.lastDayOfMonth(today)),
         dataBound: function(e) {
