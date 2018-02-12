@@ -95,7 +95,7 @@ function initialLateStateVariables(){
 function updateToDoCounts(){
     var data = showData();
     if(data != null){
-        var completedData = data.items.filter(element => element.isCompleted == true);
+        var completedData = data.items.filter(element => element.isCompleted);
         document.getElementById("completed-badge").innerText = completedData.length;
         document.getElementById("uncompleted-badge").innerText = data.items.length - completedData.length;
     }
