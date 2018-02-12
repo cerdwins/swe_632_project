@@ -128,6 +128,7 @@ function toMMDDYYYYString(date) {
     var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
     return dateInMMDDYYYY;
 }
+
 //Creates a line item in the #list-group.  Use 1 Array Json Value
 function createLineItemInToDoList(data) {
     //var splitted = data.dueDate.split(":");
