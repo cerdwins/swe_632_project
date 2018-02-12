@@ -46,12 +46,11 @@ function createLogValue() {
     localStorage.setItem('todo', JSON.stringify(todo_array));
     //(Developer Note:  This is a STUB as this is for the the UI Class.  NoSQL would take the place of this)
     var test = JSON.parse(localStorage.getItem('todo'));
-    console.log(test[0].name);
-    console.log(test[0].date);
-    console.log(test[0].text);
-    console.log(test[0].importance);
 }
-
+//date formating
+function toMMDDYYYY(date) {
+    return kendo.toString(date, 'MM/dd/yyyy');
+}
 
 
 /** Gets all localStorage Logs and Writes them into the DOM @ #list-group */
@@ -64,7 +63,7 @@ function getLogValue(UserName) {
             "<input type='checkbox' class='form-check-input' value='' checked>" + todo[i].text +
             "</label>"
         "<i class='fa fa-trash float-right trash'></i>" +
-        "<p class='small-text'>Due Date:" + todo_array[i].date + "</p>"
+        "<p class='small-text'>Due Date:" + toMMDDYYYY(todo_array[i].date) + "</p>"
         "</li>"
         $("list-group").append(list_item);
     }

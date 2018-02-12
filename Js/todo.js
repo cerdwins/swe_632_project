@@ -123,27 +123,42 @@ function showToDoList() {
         }
     }
 }
-
+//convert to mm/dd/yyyy
+function toMMDDYYYYString(date) {
+    var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
+    return dateInMMDDYYYY;
+}
 //Creates a line item in the #list-group.  Use 1 Array Json Value
-function createLineItemInToDoList(data){
-    var dueDate = toMMDDYYYY(new Date(data.dueDate));
-    if(data.isCompleted){
-        var html ='<li class="list-group-item highList">' +
-                    '<label class="form-check-label completed-item">' +
-                    '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '" checked>' + data.name +
-                    '</label>' +
-                    '<i class="fa fa-trash float-right trash"></i>' +
-                    '<p class="small-text">Due Date: ' + dueDate + '</p>' +
-                    '</li>';
+function createLineItemInToDoList(data) {
+    //var splitted = data.dueDate.split(":");
+    //data.dueDate = splitted[0];
+    if (data.importance == VERY_HIGH_IMPORTANCE) {
+        var listType = "veryHighList";
+    }
+    if (data.importance == HIGH_IMPORTANCE) {
+        var listType = "highList";
+    }
+    if (data.importance == NORMAL_IMPORTANCE) {
+        var listType = "normalList";
+    }
+
+    if (data.isCompleted) {
+        var html = '<li class="list-group-item ' + listType + '">' +
+            '<label class="form-check-label completed-item">' +
+            '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '" checked>' + data.name +
+            '</label>' +
+            '<i class="fa fa-trash float-right trash"></i>' +
+            '<p class="small-text">Due Date: ' + toMMDDYYYYString(new Date(data.dueDate)) + '</p>' +
+            '</li>';
         $("#completedList").append(html);
-    }else{
-        var html ='<li class="list-group-item highList">' +
-                    '<label class="form-check-label">' +
-                    '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '">' + data.name +
-                    '</label>' +
-                    '<i class="fa fa-trash float-right trash"></i>' + 
-                    '<p class="small-text">Due Date: ' + dueDate + '</p>' +
-                    '</li>';
+    } else {
+        var html = '<li class="list-group-item ' + listType + '">' +
+            '<label class="form-check-label">' +
+            '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '">' + data.name +
+            '</label>' +
+            '<i class="fa fa-trash float-right trash"></i>' +
+            '<p class="small-text">Due Date: ' + toMMDDYYYYString(new Date(data.dueDate)) + '</p>' +
+            '</li>';
         $("#notCompleted").append(html);
     }
 }
@@ -218,6 +233,7 @@ function changeStatusOfAToDo(id) {
 $("#deleteStorage").click(function() {
     if (confirm("Are you sure you would like to remove all the data?")) {
         localStorage.clear();
+        location.reload();
     }
 
 });
@@ -243,6 +259,11 @@ function removeItemFromArray(array, id) {
 //convert to mm/dd/yyyy
 function toMMDDYYYY(date) {
     return kendo.toString(date, 'MM/dd/yyyy');
+}
+//convert to mm/dd/yyyy
+function toMMDDYYYYString(date) {
+    var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
+    return dateInMMDDYYYY;
 }
 
 var categorizedItems = (function() {
@@ -308,7 +329,8 @@ var categorizedItems = (function() {
         });
     };
 
-    var CARET_RIGHT_CLASS = 'fa-caret-right', CARET_DOWN_CLASS = 'fa-caret-down';
+    var CARET_RIGHT_CLASS = 'fa-caret-right',
+        CARET_DOWN_CLASS = 'fa-caret-down';
     var toggleCaret = function($element, display) {
         $element.addClass(display ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
             .removeClass(display ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
