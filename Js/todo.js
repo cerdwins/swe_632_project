@@ -128,6 +128,7 @@ function toMMDDYYYYString(date) {
     var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
     return dateInMMDDYYYY;
 }
+
 //Creates a line item in the #list-group.  Use 1 Array Json Value
 function createLineItemInToDoList(data) {
     //var splitted = data.dueDate.split(":");
@@ -222,7 +223,7 @@ function changeStatusOfAToDo(id) {
         for (i = 0, len = currentData.items.length; i < len; i++) {
             var item = currentData.items[i];
             if (item.id === id) {
-                item.isCompleted = !item.isCompleted;
+                item.isCompleted = ! item.isCompleted;
                 setDataToLocalStorage(currentData);
                 break;
             }
@@ -288,7 +289,7 @@ var categorizedItems = (function() {
         }
     });
 
-    var dataModel = new kendo.data.Model.define({
+    var dataModel = kendo.data.Model.define({
         id: 'id',
         fields: {
             id: {
@@ -337,8 +338,8 @@ var categorizedItems = (function() {
     };
 
     var veryHigh = createDataSourceByImportance(VERY_HIGH_IMPORTANCE);
-    var high = createDataSourceByImportance(HIGH_IMPORTANCE);
-    var normal = createDataSourceByImportance(NORMAL_IMPORTANCE);
+    var high     = createDataSourceByImportance(HIGH_IMPORTANCE);
+    var normal   = createDataSourceByImportance(NORMAL_IMPORTANCE);
 
     var byImportance = kendo.observable({
         veryHigh: veryHigh,
@@ -349,9 +350,9 @@ var categorizedItems = (function() {
         normalTotal: null,
         toggleList: function(e) {
             var $target = $(e.currentTarget);
-            var displayVeryHigh = $target.is('#todo-list-very') && !this.displayVeryHigh;
-            var displayHigh = $target.is('#todo-list-high') && !this.displayHigh;
-            var displayNormal = $target.is('#todo-list-normal') && !this.displayNormal;
+            var displayVeryHigh = $target.is('#todo-list-very')     && ! this.displayVeryHigh;
+            var displayHigh     = $target.is('#todo-list-high')     && ! this.displayHigh;
+            var displayNormal   = $target.is('#todo-list-normal')   && ! this.displayNormal;
             this.set('displayVeryHigh', displayVeryHigh);
             toggleCaret($('#todo-list-very i'), displayVeryHigh);
             this.set('displayHigh', displayHigh);
@@ -390,10 +391,10 @@ var categorizedItems = (function() {
         displayThisMonth: false,
         toggleList: function(e) {
             var $target = $(e.currentTarget);
-            var displayToday = $target.is('#cat-today') && !this.displayToday;
-            var displayThisWeek = $target.is('#cat-thisweek') && !this.displayThisWeek;
-            var displayNextWeek = $target.is('#cat-nextweek') && !this.displayNextWeek;
-            var displayThisMonth = $target.is('#cat-thismonth') && !this.displayThisMonth;
+            var displayToday        = $target.is('#cat-today')      && ! this.displayToday;
+            var displayThisWeek     = $target.is('#cat-thisweek')   && ! this.displayThisWeek;
+            var displayNextWeek     = $target.is('#cat-nextweek')   && ! this.displayNextWeek;
+            var displayThisMonth    = $target.is('#cat-thismonth')  && ! this.displayThisMonth;
             this.set('displayToday', displayToday);
             toggleCaret($('#cat-today i'), displayToday);
             this.set('displayThisWeek', displayThisWeek);
@@ -404,7 +405,7 @@ var categorizedItems = (function() {
             toggleCaret($('#cat-thismonth i'), displayThisMonth);
         },
         today: createDataSourceByDate(today, today),
-        thisWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 0, 1), dateUtils.dayOfWeek(today, 6, 1)),
+        thisWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 0, -1), dateUtils.dayOfWeek(today, 6, 1)),
         nextWeek: createDataSourceByDate(nextSunday, dateUtils.dayOfWeek(nextSunday, 6, 1)),
         thisMonth: createDataSourceByDate(dateUtils.firstDayOfMonth(today), dateUtils.lastDayOfMonth(today)),
         dataBound: function(e) {
