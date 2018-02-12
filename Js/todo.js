@@ -83,6 +83,7 @@ function initialLateStateVariables(){
         rapidRefresh();
     });
     $(".trash").click(function(){
+        if (! confirm('Are you sure you want to delete this ToDo item?')) return;
         var correctNode = this.parentElement.children[0].children[0];
         var id = $(correctNode).data("internalid");
         deleteItem(id);
