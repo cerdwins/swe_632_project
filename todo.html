@@ -6,27 +6,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" type="image/ico" href=" Assets/icons/faviconA.ico" />
-    <link rel="stylesheet " type="text/css " href="Css/style.css " />
-    <link rel="stylesheet " type="text/css " href="Css/todo.css " />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet " integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN " crossorigin="anonymous ">
 
-    <!-- Bootstrap AND Font Awesome CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css " rel="stylesheet " integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN " crossorigin="anonymous ">
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet " href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css " integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm " crossorigin="anonymous ">
     <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.117/styles/kendo.common.min.css" />
     <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.117/styles/kendo.blueopal.min.css" />
 
-    <!-- KENDO CSS -->
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.117/styles/kendo.rtl.min.css" />
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.117/styles/kendo.silver.min.css" />
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.117/styles/kendo.mobile.all.min.css" />
-    <!--jQuery and other JS libraries-->
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-    <script src="https://kendo.cdn.telerik.com/2018.1.117/js/kendo.all.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js " integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q " crossorigin="anonymous "></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js " integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl " crossorigin="anonymous "></script>
+    <link rel="stylesheet " type="text/css " href="Css/style.css " />
+    <link rel="stylesheet " type="text/css " href="Css/todo.css " />
 
-    <script src="Js/todo.js"></script>
-
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <title>Awesome Todo</title>
 </head>
 
@@ -36,50 +26,95 @@
         <button class="navbar-toggler " type="button " data-toggle="collapse " data-target="#navBarItems " aria-controls="navbarSupportedContent " aria-expanded="false " aria-label="Toggle navigation ">
                         <span class="navbar-toggler-icon "></span>
                       </button>
+        <button class="btn btn-danger" id="deleteStorage">Delete Storage</button>
     </nav>
+
     <div class="row bg-gray mainDiv ">
         <div class="col-sm-3 card bg-white padding-all-one padding-left-two scroll  ">
             <div class="small-spacer"></div>
             <h2>TODO LISTS</h2>
             <div class="small-spacer"></div>
-            <p class="card-text "><i class="fa fa-exclamation-circle"></i>Categorized By Importance</p>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link" data-toggle="collapse"><i class="fa fa-caret-down"></i>Very High <span class="badge badge-danger badge-pill">14 items</span></p>
-
-            </div>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link"><i class="fa fa-caret-down"></i>High <span class="badge badge-warning badge-pill">5 items</span></p>
-
-            </div>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link"><i class="fa fa-caret-down"></i>Normal <span class="badge badge-primary badge-pill">No items</span></p>
+            <div id="categorized-by-importance">
+                <p class="card-text "><i class="fa fa-exclamation-circle"></i>Categorized By Importance</p>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" data-toggle="collapse" id="todo-list-very" data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right"></i> Very High <span class="badge badge-danger badge-pill" data-bind="text: veryHighTotal"></span>
+                    </p>
+                    <div data-bind="slide: displayVeryHigh">
+                        <ul data-role="listview" class="list-group" data-bind="source: veryHigh, events: { dataBound: dataBound }" data-template="by-importance-template"></ul>
+                    </div>
+                </div>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="todo-list-high" data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right"></i> High <span class="badge badge-warning badge-pill" data-bind="text: highTotal"></span>
+                    </p>
+                    <div data-bind="slide: displayHigh">
+                        <ul data-role="listview" class="list-group" data-bind="source: high, events: { dataBound: dataBound }" data-template="by-importance-template"></ul>
+                    </div>
+                </div>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="todo-list-normal" data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right"></i> Normal <span class="badge badge-primary badge-pill" data-bind="text: normalTotal"></span>
+                    </p>
+                    <div data-bind="slide: displayNormal">
+                        <ul data-role="listview" class="list-group" data-bind="source: normal, events: { dataBound: dataBound }" data-template="by-importance-template"></ul>
+                    </div>
+                </div>
+                <script type="text/x-kendo-tmpl" id="by-importance-template">
+                    <li class="list-group-item">#: name # <span class="small-text">#: kendo.toString(dueDate, 'd') #</span></li>
+                </script>
             </div>
             <div class="small-spacer"></div>
-            <p class="card-text "> <i class="fa fa-check-circle"></i>Categorized By Date</p>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link"><i class="fa fa-caret-down"></i>Today <span class="badge badge-primary badge-pill">10 items</span></p>
-            </div>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link"><i class="fa fa-caret-down"></i>This Week <span class="badge badge-primary badge-pill">4 items</span></p>
-            </div>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link"><i class="fa fa-caret-down"></i>Last Week <span class="badge badge-primary badge-pill">1 item</span></p>
-            </div>
-            <div class="category padding-left-six ">
-                <p class="small-text link" class="btn btn-link"><i class="fa fa-caret-down"></i>This Month <span class="badge badge-primary badge-pill">5 Items</span></p>
+            <div id="categorized-by-date">
+                <p class="card-text "> <i class="fa fa-calendar"></i>Categorized By Date</p>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="cat-today" data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right"></i>Today <span class="badge badge-primary badge-pill" data-bind="text: todayTotal"></span>
+                    </p>
+                    <div data-bind="slide: displayToday">
+                        <ul data-role="listview" class="list-group" data-bind="source: today, events: { dataBound: dataBound }" data-template="by-importance-template"></ul>
+                    </div>
+                </div>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="cat-thisweek" data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right"></i>This Week <span class="badge badge-primary badge-pill" data-bind="text: thisWeekTotal"></span>
+                    </p>
+                    <div data-bind="slide: displayThisWeek">
+                        <ul data-role="listview" class="list-group" data-bind="source: thisWeek, events: { dataBound: dataBound }" data-template="by-importance-template"></ul>
+                    </div>
+                </div>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="cat-nextweek" data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right"></i>Next Week <span class="badge badge-primary badge-pill" data-bind="text: nextWeekTotal"></span>
+                    </p>
+                    <div data-bind="slide: displayNextWeek">
+                        <ul data-role="listview" class="list-group" data-bind="source: nextWeek, events: { dataBound: dataBound }" data-template="by-importance-template"></ul>
+                    </div>
+                </div>
+                <div class="category padding-left-six ">
+                    <p class="small-text link" class="btn btn-link" id="cat-thismonth" data-bind="events: { click: toggleList }">
+                        <i class="fa fa-caret-right"></i>This Month <span class="badge badge-primary badge-pill" data-bind="text: thisMonthTotal"></span>
+                    </p>
+                    <div data-bind="slide: displayThisMonth">
+                        <ul data-role="listview" class="list-group" data-bind="source: thisMonth, events: { dataBound: dataBound }" data-template="by-importance-template"></ul>
+                    </div>
+                </div>
+                <script type="text/x-kendo-tmpl" id="by-date-template">
+                    <li class="list-group-item">#: name # <span class="small-text">#: kendo.toString(dueDate, 'd') #</span></li>
+                </script>
             </div>
             <p class="card-text"><i class="fa fa-search"></i>Custom Search</p>
             <span>From:</span>
-            <input id="fromDate" value="01/01/2018" title="datepicker" style="width: 100%" />
+            <input id="fromDate" value="" title="datepicker" style="width: 100%" />
             <span>To:</span>
-            <input id="toDate" value="02/01/2018" title="datepicker" style="width: 100%" /><br/>
+            <input id="toDate" value="" title="datepicker" style="width: 100%" /><br/>
             <a id="search" href="#" class="btn btn-main">Search</a>
 
         </div>
         <div class=" col-sm-9 bg-white padding-all-one scroll ">
             <div class="row">
                 <div class="col-sm-6" id="upper-section">
-                    <h4><i class="fa fa-list-alt"></i> Create a todo List in three simple steps</h4>
+                    <h3><i class="fa fa-list-alt"></i> Create a ToDo list in three simple steps</h3>
                     <div class="small-spacer"></div>
                     <div>
                         <strong><i class="fa fa-check"></i>Step 1</strong>: Pick a Date &nbsp;&nbsp;&nbsp;&nbsp; <strong><i class="fa fa-check"></i>Step 2</strong>: Enter ToDo Item &nbsp; &nbsp;&nbsp;&nbsp; <strong><i class="fa fa-check"></i>Step 3</strong>:
@@ -92,34 +127,27 @@
                 <div class="col-sm-6">
                     <div class="spacer"></div>
                     <div id="todoItem">
-                        <form id="createForm" action="#">
-                            <p for="simple-input"><i class="fa fa-calendar"></i>Date currently selected on the calendar is:&nbsp;<strong id="selectedDate">2/3/2018</strong> </p>
-                            <div class="form-group">
-
-                                <input type="text" name="todoList" class="form-control" id="todoList" aria-describedby="todoList" placeholder="Enter your todo item" required>
-                                <small id="todoList" class="form-text text-muted">For Example , go for grocery shopping, pick up kids...</small>
-                            </div>
-                            <div class="small-spacer"> <i class="fa fa-exclamation-circle"></i>Select Importance</div>
+                        <form id="create-todo-item-form">
+                            <p for="simple-input">
+                                <i class="fa fa-calendar"></i>Currently selected date:<strong id="selected-date"> </strong>
+                            </p>
+                            <input id="simple-input" type="text" placeholder="enter your todo item here" class="k-textbox" style="width: 100%;" />
                             <div class="small-spacer"></div>
-                            <label class="radio-inline very-high-importance">
-                                  <input class="radio" type="radio" name="importance" value="veryHigh">Very High
-                                </label>
-                            <label class="radio-inline high-importance">
-                                  <input class="radio" type="radio" name="importance" value="high">High
-                                </label>
-                            <label class="radio-inline normal-importance">
-                                  <input class="radio" type="radio" name="importance" checked value="normal">Normal
-                                </label>
                             <div class="small-spacer"></div>
-                            <div class="small-spacer"><button type="submit" id="search" href="#" class="btn btn-main">Create ToDo Item</button></div>
+                            <div class="small-spacer"> <i class="fa fa-exclamation-circle"></i>Importance</div>
+                            <div class="small-spacer"></div>
+                            <label name="radio-importance" class="radio-inline very-high-importance">
+                                  <input class="radio" type="radio" name="importance" value="Very High">Very High
+                                </label>
+                            <label name="radio-importance" class="radio-inline high-importance">
+                                  <input class="radio" type="radio" name="importance" value="High">High
+                                </label>
+                            <label name="radio-importance" class="radio-inline normal-importance">
+                                  <input class="radio" type="radio" name="importance" value="Normal" checked>Normal
+                                </label>
                         </form>
                         <div class="small-spacer"></div>
-                        <div id="createdAlert" class="alert alert-success alert-dismissible fade hide" role="alert">
-                            <strong>Success!</strong> You have just created a to do list. Create more...
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
+                        <div class="small-spacer"><a id="create-todo-item" href="#" class="btn btn-main">Create ToDo Item</a></div>
                     </div>
                 </div>
             </div>
@@ -127,23 +155,28 @@
 
             <hr class="featurette-divider">
             <div class="small-spacer"></div>
-            <h4><i class="fa fa-clock"></i>Most Recent Todo Lists</h4>
+            <h4><i class="fa fa-clock"></i>Most Recent ToDo Lists</h4>
             <div id="display-section">
 
                 <div class="row">
                     <div id="display-todo" class="col-sm-8">
                         <ul class="nav nav-tabs">
                             <li class="nav-item">
-                                <a class="nav-link active" data-toggle="tab" href="#completed">Completed <span class="badge badge-primary badge-pill">14</span></a>
+                                <a class="nav-link" data-toggle="tab" href="#completed">
+                                    Completed <span class="badge badge-primary badge-pill" id="completed-badge">0</span>
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#notCompleted">Not completed <span class="badge badge-danger badge-pill">2</span></a>
+                                <a class="nav-link active show" data-toggle="tab" href="#notCompleted">
+                                    Not completed <span class="badge badge-danger badge-pill" id="uncompleted-badge">0</span>
+                                </a>
                             </li>
                         </ul>
                         <!--This is where the actual data will go-->
                         <div class="tab-content">
-                            <div class="tab-pane active container" id="completed">
-                                <ul class="list-group">
+                            <div class="tab-pane container" id="completed">
+                                <ul class="list-group" id="completedList">
+                                    <!--
                                     <li class="list-group-item highList">
                                         <label class="form-check-label completed-item">
                                             <input type="checkbox" class="form-check-input" value="" checked>To do list 1
@@ -176,12 +209,12 @@
                                         <p class="small-text">Due Date: 1/12/2017</p>
 
                                     </li>
-
+                                -->
 
                                 </ul>
                             </div>
-                            <div class="tab-pane container" id="notCompleted">
-                                <li class="list-group-item highList">
+                            <div class="tab-pane container active show" id="notCompleted">
+                                <!--<li class="list-group-item highList">
                                     <label class="form-check-label ">
                                                 <input type="checkbox" class="form-check-input" value="" >To do list 5
                                                 </label>
@@ -212,7 +245,7 @@
                                     <i class="fa fa-trash float-right trash"></i>
                                     <p class="small-text">Due Date: 1/12/2017</p>
 
-                                </li>
+                                </li>-->
 
                             </div>
 
@@ -226,9 +259,17 @@
 
         </div>
     </div>
+    <div id="notification"></div>
+    <script type="text/x-kendo-template" id="notification-template">
+        <div class="k-notification-wrap"><i class="fa fa-exclamation-circle"></i>#: message #</div>
+    </script>
+    <script src="https://kendo.cdn.telerik.com/2018.1.117/js/jquery.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2018.1.117/js/kendo.all.min.js"></script>
     <!-- Optional JavaScript -->
-
-
+    <script src="Js/todo.js"></script>
+    <script src="Js/scripts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js " integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q " crossorigin="anonymous "></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js " integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl " crossorigin="anonymous "></script>
 </body>
 
 </html>
