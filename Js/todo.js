@@ -9,12 +9,10 @@ $(document).ready(function() {
             top: 30
         },
         autoHideAfter: 2000,
-        templates: [
-            {
-                type: 'info',
-                template: $('#notification-template').html()
-            }
-        ],
+        templates: [{
+            type: 'info',
+            template: $('#notification-template').html()
+        }],
         width: 300,
         height: 50
     }).data('kendoNotification');
@@ -39,7 +37,7 @@ $(document).ready(function() {
         // display month and year in the input
         format: "MM/dd/yyyy",
     });
-    
+
     /******************EVENT HANDLING PARTS ONLY********************** */
 
     //Display selected date on the calendar on load
@@ -68,22 +66,22 @@ $(document).ready(function() {
 });
 
 //updates and refreshes the todo list
-function rapidRefresh(){
+function rapidRefresh() {
     emptyToDoList();
     showToDoList();
     updateToDoCounts()
-    initialLateStateVariables();  //intializes the variables that are only now available
+    initialLateStateVariables(); //intializes the variables that are only now available
 }
 
 //moves something to the completed bin or the uncompleted bin
-function initialLateStateVariables(){
-    $(".form-check-input").change(function(){
+function initialLateStateVariables() {
+    $(".form-check-input").change(function() {
         var id = $(this).data("internalid");
         changeStatusOfAToDo(id);
         rapidRefresh();
     });
-    $(".trash").click(function(){
-        if (! confirm('Are you sure you want to delete this ToDo item?')) return;
+    $(".trash").click(function() {
+        if (!confirm('Are you sure you want to delete this ToDo item?')) return;
         var correctNode = this.parentElement.children[0].children[0];
         var id = $(correctNode).data("internalid");
         deleteItem(id);
@@ -93,14 +91,13 @@ function initialLateStateVariables(){
 }
 
 //updates the counts above the ToDo list
-function updateToDoCounts(){
+function updateToDoCounts() {
     var data = showData();
-    if(data != null){
+    if (data != null) {
         var completedData = data.items.filter(element => element.isCompleted);
         document.getElementById("completed-badge").innerText = completedData.length;
         document.getElementById("uncompleted-badge").innerText = data.items.length - completedData.length;
-    }
-    else{
+    } else {
         document.getElementById("completed-badge").innerText = 0;
         document.getElementById("uncompleted-badge").innerText = 0;
     }
@@ -108,18 +105,20 @@ function updateToDoCounts(){
 
 
 //empties the ToDo List
-function emptyToDoList(){
+function emptyToDoList() {
     $("#notCompleted").empty();
     $("#completedList").empty();
 }
 
-var VERY_HIGH_IMPORTANCE = 'Very High', HIGH_IMPORTANCE = 'High', NORMAL_IMPORTANCE = 'Normal';
+var VERY_HIGH_IMPORTANCE = 'Very High',
+    HIGH_IMPORTANCE = 'High',
+    NORMAL_IMPORTANCE = 'Normal';
 
 //Creates the lists in the "Most Recent Todo Lists" area
-function showToDoList(){
+function showToDoList() {
     var currentData = showData();
-    if(currentData != null){
-        for(i = 0; i < currentData.items.length; i++){
+    if (currentData != null) {
+        for (i = 0; i < currentData.items.length; i++) {
             createLineItemInToDoList(currentData.items[i]);
         }
     }
@@ -133,7 +132,7 @@ function createLineItemInToDoList(data){
                     '<label class="form-check-label completed-item">' +
                     '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '" checked>' + data.name +
                     '</label>' +
-                    '<i class="fa fa-trash float-right trash"></i>' + 
+                    '<i class="fa fa-trash float-right trash"></i>' +
                     '<p class="small-text">Due Date: ' + dueDate + '</p>' +
                     '</li>';
         $("#completedList").append(html);
@@ -146,7 +145,7 @@ function createLineItemInToDoList(data){
                     '<p class="small-text">Due Date: ' + dueDate + '</p>' +
                     '</li>';
         $("#notCompleted").append(html);
-    }  
+    }
 }
 
 //to Display the value of the calendar on the text
@@ -215,7 +214,13 @@ function changeStatusOfAToDo(id) {
         }
     }
 }
+//delete entire storage
+$("#deleteStorage").click(function() {
+    if (confirm("Are you sure you would like to remove all the data?")) {
+        localStorage.clear();
+    }
 
+});
 //Delete item from the storage
 function deleteItem(id) {
     var currentData = showData();
@@ -265,7 +270,7 @@ var categorizedItems = (function() {
     var dataModel = kendo.data.Model.define({
         id: 'id',
         fields: {
-            id : {
+            id: {
                 type: 'number'
             },
             name: {

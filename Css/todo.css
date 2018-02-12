@@ -19,6 +19,11 @@
     color: #887702;
 }
 
+#deleteStorage {
+    position: absolute;
+    right: 1%;
+}
+
 .color-green {
     color: #27ae60 !important;
 }
