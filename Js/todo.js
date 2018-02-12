@@ -83,6 +83,7 @@ function initialLateStateVariables(){
         rapidRefresh();
     });
     $(".trash").click(function(){
+        if (! confirm('Are you sure you want to delete this ToDo item?')) return;
         var correctNode = this.parentElement.children[0].children[0];
         var id = $(correctNode).data("internalid");
         deleteItem(id);
@@ -192,6 +193,7 @@ function addToDoList(name, dueDate, importance, isCompleted) {
     currentData.items.push(toDo);
     setDataToLocalStorage(currentData);
     categorizedItems.addItem(toDo);
+    $('#simple-input').val('');
 }
 //Display all the items
 function showData() {
@@ -302,11 +304,15 @@ var categorizedItems = (function() {
         });
     };
 
+    var CARET_RIGHT_CLASS = 'fa-caret-right', CARET_DOWN_CLASS = 'fa-caret-down';
+    var toggleCaret = function($element, display) {
+        $element.addClass(display ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
+            .removeClass(display ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+    };
+
     var veryHigh = createDataSourceByImportance(VERY_HIGH_IMPORTANCE);
     var high     = createDataSourceByImportance(HIGH_IMPORTANCE);
     var normal   = createDataSourceByImportance(NORMAL_IMPORTANCE);
-
-    var CARET_RIGHT_CLASS = 'fa-caret-right', CARET_DOWN_CLASS = 'fa-caret-down';
 
     var byImportance = kendo.observable({
         veryHigh: veryHigh,
@@ -321,14 +327,11 @@ var categorizedItems = (function() {
             var displayHigh     = $target.is('#todo-list-high')     && ! this.displayHigh;
             var displayNormal   = $target.is('#todo-list-normal')   && ! this.displayNormal;
             this.set('displayVeryHigh', displayVeryHigh);
-            $('#todo-list-very i').addClass(displayVeryHigh ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
-                .removeClass(displayVeryHigh ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            toggleCaret($('#todo-list-very i'), displayVeryHigh);
             this.set('displayHigh', displayHigh);
-            $('#todo-list-high i').addClass(displayHigh ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
-                .removeClass(displayHigh ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            toggleCaret($('#todo-list-high i'), displayHigh);
             this.set('displayNormal', displayNormal);
-            $('#todo-list-normal i').addClass(displayNormal ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
-                .removeClass(displayNormal ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            toggleCaret($('#todo-list-normal i'), displayNormal);
         },
         displayVeryHigh: false,
         displayHigh: false,
@@ -366,17 +369,13 @@ var categorizedItems = (function() {
             var displayNextWeek     = $target.is('#cat-nextweek')   && ! this.displayNextWeek;
             var displayThisMonth    = $target.is('#cat-thismonth')  && ! this.displayThisMonth;
             this.set('displayToday', displayToday);
-            $('#cat-today i').addClass(displayToday ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
-                .removeClass(displayToday ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            toggleCaret($('#cat-today i'), displayToday);
             this.set('displayThisWeek', displayThisWeek);
-            $('#cat-thisweek i').addClass(displayThisWeek ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
-                .removeClass(displayThisWeek ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            toggleCaret($('#cat-thisweek i'), displayThisWeek);
             this.set('displayNextWeek', displayNextWeek);
-            $('#cat-nextweek i').addClass(displayNextWeek ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
-                .removeClass(displayNextWeek ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            toggleCaret($('#cat-nextweek i'), displayNextWeek);
             this.set('displayThisMonth', displayThisMonth);
-            $('#cat-thismonth i').addClass(displayThisMonth ? CARET_DOWN_CLASS : CARET_RIGHT_CLASS)
-                .removeClass(displayThisMonth ? CARET_RIGHT_CLASS : CARET_DOWN_CLASS);
+            toggleCaret($('#cat-thismonth i'), displayThisMonth);
         },
         today: createDataSourceByDate(today, today),
         thisWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 0, 1), dateUtils.dayOfWeek(today, 6, 1)),
