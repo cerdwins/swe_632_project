@@ -30,6 +30,7 @@
 .trash {
     cursor: pointer;
     color: #EA2027 !important;
+    padding-top: 5%;
 }
 
 #display-todo .list-group-item {
@@ -83,18 +84,32 @@
     font-size: 13px;
 }
 
+.small-text-gray {
+    font-size: 12px;
+    color: #aaa;
+}
+
 .link {
     cursor: pointer;
 }
 
+#deleteAll {
+    position: absolute;
+    right: 1%;
+}
+
 .veryHighList {
-    border-left: 3px solid #EA2027 !important;
+    border-left: 4px solid #EA2027 !important;
 }
 
 .highList {
-    border-left: 3px solid #887702 !important;
+    border-left: 4px solid #887702 !important;
 }
 
 .normalList {
-    border-left: 3px solid #0984e3 !important;
+    border-left: 4px solid #0984e3 !important;
+}
+
+.hide {
+    display: none;
 }
