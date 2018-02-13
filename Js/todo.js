@@ -52,13 +52,18 @@ $(document).ready(function() {
         //Gather form data
         var dueDate = calendar.value();
         var formData = $('#create-todo-item-form').serializeArray();
-        var name = document.getElementById("simple-input").value
+        var name = document.getElementById("simple-input").value;
         var importance = formData[0].value;
-        addToDoList(name, dueDate, importance, false);
-        //reload the entire page
-        $('#createdAlert').removeClass('hide').addClass('show');
-        rapidRefresh();
-        notification.show({ message: 'Your ToDo item has been added' });
+        if (name) {
+            addToDoList(name, dueDate, importance, false);
+            //reload the entire page
+            $('#createdAlert').removeClass('hide').addClass('show');
+            rapidRefresh();
+            notification.show({ message: 'Your ToDo item has been added' });
+        } else {
+            notification.show('Todo Name must be specified.', "error");
+        }
+
     });
 
     rapidRefresh();
@@ -69,7 +74,7 @@ $(document).ready(function() {
 function rapidRefresh() {
     emptyToDoList();
     showToDoList();
-    updateToDoCounts()
+    updateToDoCounts();
     initialLateStateVariables(); //intializes the variables that are only now available
 }
 
@@ -94,10 +99,13 @@ function initialLateStateVariables() {
 function updateToDoCounts() {
     var data = showData();
     if (data != null) {
+        $('.totalTodos').text(data.index);
         var completedData = data.items.filter(element => element.isCompleted);
+
         document.getElementById("completed-badge").innerText = completedData.length;
         document.getElementById("uncompleted-badge").innerText = data.items.length - completedData.length;
     } else {
+        $('.totalTodos').text('0');
         document.getElementById("completed-badge").innerText = 0;
         document.getElementById("uncompleted-badge").innerText = 0;
     }
@@ -121,6 +129,7 @@ function showToDoList() {
         for (i = 0; i < currentData.items.length; i++) {
             createLineItemInToDoList(currentData.items[i]);
         }
+
     }
 }
 //convert to mm/dd/yyyy
@@ -145,18 +154,18 @@ function createLineItemInToDoList(data) {
 
     if (data.isCompleted) {
         var html = '<li class="list-group-item ' + listType + '">' +
-            '<label class="form-check-label completed-item">' +
+            '<label class="form-check-label completed-item main">' +
             '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '" checked>' + data.name +
-            '</label>' +
+            '<span class="checkmark"></span></label>' +
             '<i class="fa fa-trash float-right trash"></i>' +
             '<p class="small-text">Due Date: ' + toMMDDYYYYString(new Date(data.dueDate)) + '</p>' +
             '</li>';
         $("#completedList").append(html);
     } else {
         var html = '<li class="list-group-item ' + listType + '">' +
-            '<label class="form-check-label">' +
+            '<label class="form-check-label main">' +
             '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '">' + data.name +
-            '</label>' +
+            '<span class="checkmark"></span></label>' +
             '<i class="fa fa-trash float-right trash"></i>' +
             '<p class="small-text">Due Date: ' + toMMDDYYYYString(new Date(data.dueDate)) + '</p>' +
             '</li>';
@@ -182,7 +191,7 @@ function Todo(id, name, dueDate, importance, isCompleted) {
 if (typeof(Storage) !== "undefined") {
 
 } else {
-    alert("Local storage not supported.")
+    alert("Local storage not supported.");
 }
 /****************LOCAL STORAGE STUFFS ENDS***************/
 //stored using the key="todos"
@@ -209,7 +218,7 @@ function addToDoList(name, dueDate, importance, isCompleted) {
     categorizedItems.addItem(toDo);
     $('#simple-input').val('');
 }
-//Display all the items
+//Display all the data
 function showData() {
     return getDataFromLocalStorage();
 }
@@ -223,7 +232,7 @@ function changeStatusOfAToDo(id) {
         for (i = 0, len = currentData.items.length; i < len; i++) {
             var item = currentData.items[i];
             if (item.id === id) {
-                item.isCompleted = ! item.isCompleted;
+                item.isCompleted = !item.isCompleted;
                 setDataToLocalStorage(currentData);
                 break;
             }
@@ -233,6 +242,8 @@ function changeStatusOfAToDo(id) {
 //delete entire storage
 $("#deleteStorage").click(function() {
     if (confirm("Are you sure you would like to remove all the data?")) {
+
+        $('#notification').data('kendoNotification').show({ message: 'Please wait...refreshing data' });
         localStorage.clear();
         location.reload();
     }
@@ -245,6 +256,7 @@ function deleteItem(id) {
         if (currentData.index == 1) {
             localStorage.clear();
         } else {
+            currentData.index -= 1;
             currentData.items = removeItemFromArray(currentData.items, id);
             setDataToLocalStorage(currentData);
         }
@@ -256,6 +268,8 @@ function removeItemFromArray(array, id) {
     return array.filter(e => e.id !== id);
 }
 
+
+
 /*************DATE UTILITIES************/
 //convert to mm/dd/yyyy
 function toMMDDYYYY(date) {
@@ -266,6 +280,213 @@ function toMMDDYYYYString(date) {
     var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
     return dateInMMDDYYYY;
 }
+
+//format
+function toMMDDYYYYForComparing(date) {
+    var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
+    return new Date(dateInMMDDYYYY);
+}
+//***********BOSTRAP MODAL AND THEIR OPERATIONS************ */
+//When users click on the items on the left panel 
+$('.category').on('click', '.openModal', function() {
+    var currentData = showData();
+    if (currentData) {
+        var dataToBeBound = null;
+        var category = $(this).attr('data-category');
+        var filter = $(this).attr('data-filter');
+        if (category == "1") {
+            //this is for importance
+            var allImportantData = searchByImportance(currentData.items);
+            if (filter == "veryhigh") {
+                dataToBeBound = allImportantData.veryHigh;
+            } else if (filter == "high") {
+                dataToBeBound = allImportantData.high;
+            } else if (filter == "normal") {
+                dataToBeBound = allImportantData.normal;
+            } else {
+                alert("no filter found");
+            }
+
+        } else if (category == "2") {
+            //this is for predefined dates
+            var allDatesData = searchByPredefinedDates(currentData.items);
+            if (filter == "today") {
+                dataToBeBound = allDatesData.today;
+            } else if (filter == "thisweek") {
+                dataToBeBound = allDatesData.thisWeek;
+            } else if (filter == "nextweek") {
+                dataToBeBound = allDatesData.nextWeek;
+
+            } else if (filter == "thismonth") {
+                dataToBeBound = allDatesData.thisMonth;
+            } else {
+                alert("no filter found");
+            }
+
+        } else if (category == "3") {
+
+            //this is for custom search
+
+            //check to see if any of the fields are empty
+            //todate cannot be smaller than the 
+            var fromDate = $("#fromDate").data("kendoDatePicker").value();
+            var toDate = $("#toDate").data("kendoDatePicker").value();
+            console.log(fromDate + ":" + toDate);
+            if (fromDate && toDate) {
+                if (toDate < fromDate) {
+                    $('#notification').data('kendoNotification').show('to date has to be bigger.Try again', "error");
+                } else {
+                    dataToBeBound = searchBetweenDates(currentData.items, fromDate, toDate);
+                }
+            } else {
+                $('#notification').data('kendoNotification').show('Missing from or to date.Try again', "error");
+            }
+        } else {
+            alert("no category found");
+        }
+        if (dataToBeBound.length > 0) {
+            bindDataToModal(dataToBeBound);
+        } else {
+            alert("No data to display");
+        }
+
+
+    } else {
+        alert("No data found in your system");
+    }
+
+
+
+});
+$('#todoModal').on('hidden.bs.modal', function() {
+    $('#md-todoList ul.list-group').empty();
+});
+//this will create a modal and bind the incoming data to it
+function bindDataToModal(data) {
+    $('#md-todoList ul.list-group').empty();
+    //populate the recent data
+    $.each(data, function(index, value) {
+        var importanceClass = "";
+        var completed = "";
+        var checked = "";
+        if (value.isCompleted) {
+            completed = "completed-item";
+            checked = "checked";
+        }
+        if (value.importance.toLowerCase() == VERY_HIGH_IMPORTANCE) {
+            importanceClass = "veryHighList";
+        } else if (value.importance.toLowerCase() == HIGH_IMPORTANCE) {
+            importanceClass = "highList";
+        } else if (value.importance.toLowerCase() == HIGH_IMPORTANCE) {
+            importanceClass = "normalList";
+        } else {
+            //no class
+        }
+
+        $('#md-todoList ul.list-group').append('<li class="list-group-item ' + importanceClass + '"><label class="form-check-label main ' + completed + '">' +
+            '<input data-id="' + value.id + '" type="checkbox" class="form-check-input changeStatus" value="" ' + checked + '>' + value.name + '<span class="checkmark"></span></label><i data-id="' + value.id +
+            '"  class="fa fa-trash float-right trash">' +
+            '</i><p class="small-text">Due Date: ' + toMMDDYYYYString(new Date(value.dueDate)) + '</p></li>');
+
+
+    });
+    $('#toDoModal').modal('show');
+}
+
+//search between dates
+function searchBetweenDates(currentData, fromDate, toDate) {
+    var result = [];
+    if (currentData) {
+
+        result = currentData.filter(function(element, index) {
+            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= toMMDDYYYYForComparing(fromDate) && toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= toMMDDYYYYForComparing(toDate);
+        });
+    }
+    return result;
+}
+
+
+//search by predefined dates
+function searchByPredefinedDates(currentData) {
+    var result = {
+        today: [],
+        thisWeek: [],
+        nextWeek: [],
+        thisMonth: []
+    };
+    if (currentData) {
+        result.today = currentData.filter(function(element, index) {
+            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() == toMMDDYYYYForComparing(new Date()).getTime();
+        });
+        result.thisWeek = currentData.filter(function(element, index) {
+            var startDate = getStartAndEndDate("thisweek").start;
+            var endDate = getStartAndEndDate("thisweek").end;
+            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= startDate && toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= endDate;
+        });
+        result.lastWeek = currentData.filter(function(element, index) {
+
+            var startDate = getStartAndEndDate("nextweek").start;
+            var endDate = getStartAndEndDate("nextweek").end;
+            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= startDate && toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= endDate;
+        });
+        result.thisMonth = currentData.filter(function(element, index) {
+            var startDate = getStartAndEndDate("thismonth").start;
+            var endDate = getStartAndEndDate("thismonth").end;
+            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= startDate && toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= endDate;
+        });
+
+    }
+    return result;
+}
+//based on the params, it will generate start and end date
+function getStartAndEndDate(range) {
+    let result = { start: new Date(), end: new Date() };
+    if (range.toLowerCase() == "today") {
+        result.start = toMMDDYYYYForComparing(new Date());
+        result.end = toMMDDYYYYForComparing(new Date());
+    }
+    if (range.toLowerCase() == "thisweek") {
+        var current = new Date();
+        var diff = current.getDate() - current.getDay();
+        result.start = toMMDDYYYYForComparing(new Date(current.setDate(diff)));
+        result.end = toMMDDYYYYForComparing(new Date(current.setDate(result.start.getDate() + 6)));
+    }
+    if (range.toLowerCase() == "nextweek") {
+        var today = new Date();
+        var nextSunday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (7 - today.getDay()));
+        result.start = toMMDDYYYYForComparing(nextSunday);
+        result.end = toMMDDYYYYForComparing(new Date(today.setDate(result.start.getDate() + 6)));
+    }
+    if (range.toLowerCase() == "thismonth") {
+        var date = new Date(),
+            year = date.getFullYear(),
+            month = date.getMonth();
+        result.start = toMMDDYYYYForComparing(new Date(year, month, 1));
+        result.end = toMMDDYYYYForComparing(new Date(year, month + 1, 0));
+    }
+    return result;
+}
+//search for an item by importance
+function searchByImportance(currentData) {
+    var result = { veryHigh: [], high: [], normal: [] };
+    if (currentData) {
+        result.veryHigh = currentData.filter(function(element) {
+            return element.importance == VERY_HIGH_IMPORTANCE;
+        });
+        result.high = currentData.filter(function(element) {
+            return element.importance == HIGH_IMPORTANCE;
+        });
+        result.normal = currentData.filter(function(element) {
+            return element.importance == NORMAL_IMPORTANCE;
+        });
+
+    }
+    return result;
+}
+
+
+
+/**********MODAL DONE*************** */
 
 var categorizedItems = (function() {
     var formatItems = function(count) {
@@ -338,8 +559,8 @@ var categorizedItems = (function() {
     };
 
     var veryHigh = createDataSourceByImportance(VERY_HIGH_IMPORTANCE);
-    var high     = createDataSourceByImportance(HIGH_IMPORTANCE);
-    var normal   = createDataSourceByImportance(NORMAL_IMPORTANCE);
+    var high = createDataSourceByImportance(HIGH_IMPORTANCE);
+    var normal = createDataSourceByImportance(NORMAL_IMPORTANCE);
 
     var byImportance = kendo.observable({
         veryHigh: veryHigh,
@@ -348,18 +569,6 @@ var categorizedItems = (function() {
         highTotal: null,
         normal: normal,
         normalTotal: null,
-        toggleList: function(e) {
-            var $target = $(e.currentTarget);
-            var displayVeryHigh = $target.is('#todo-list-very')     && ! this.displayVeryHigh;
-            var displayHigh     = $target.is('#todo-list-high')     && ! this.displayHigh;
-            var displayNormal   = $target.is('#todo-list-normal')   && ! this.displayNormal;
-            this.set('displayVeryHigh', displayVeryHigh);
-            toggleCaret($('#todo-list-very i'), displayVeryHigh);
-            this.set('displayHigh', displayHigh);
-            toggleCaret($('#todo-list-high i'), displayHigh);
-            this.set('displayNormal', displayNormal);
-            toggleCaret($('#todo-list-normal i'), displayNormal);
-        },
         displayVeryHigh: false,
         displayHigh: false,
         displayNormal: false,
@@ -389,21 +598,6 @@ var categorizedItems = (function() {
         displayThisWeek: false,
         displayNextWeek: false,
         displayThisMonth: false,
-        toggleList: function(e) {
-            var $target = $(e.currentTarget);
-            var displayToday        = $target.is('#cat-today')      && ! this.displayToday;
-            var displayThisWeek     = $target.is('#cat-thisweek')   && ! this.displayThisWeek;
-            var displayNextWeek     = $target.is('#cat-nextweek')   && ! this.displayNextWeek;
-            var displayThisMonth    = $target.is('#cat-thismonth')  && ! this.displayThisMonth;
-            this.set('displayToday', displayToday);
-            toggleCaret($('#cat-today i'), displayToday);
-            this.set('displayThisWeek', displayThisWeek);
-            toggleCaret($('#cat-thisweek i'), displayThisWeek);
-            this.set('displayNextWeek', displayNextWeek);
-            toggleCaret($('#cat-nextweek i'), displayNextWeek);
-            this.set('displayThisMonth', displayThisMonth);
-            toggleCaret($('#cat-thismonth i'), displayThisMonth);
-        },
         today: createDataSourceByDate(today, today),
         thisWeek: createDataSourceByDate(dateUtils.dayOfWeek(today, 0, -1), dateUtils.dayOfWeek(today, 6, 1)),
         nextWeek: createDataSourceByDate(nextSunday, dateUtils.dayOfWeek(nextSunday, 6, 1)),
