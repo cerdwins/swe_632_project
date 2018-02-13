@@ -251,17 +251,20 @@ $("#deleteStorage").click(function() {
 });
 //Delete item from the storage
 function deleteItem(id) {
-    var currentData = showData();
-    if (currentData) {
-        if (currentData.index == 1) {
-            localStorage.clear();
-        } else {
-            currentData.index -= 1;
-            currentData.items = removeItemFromArray(currentData.items, id);
-            setDataToLocalStorage(currentData);
+    if (id) {
+        var currentData = showData();
+        if (currentData) {
+            if (currentData.index == 1) {
+                localStorage.clear();
+            } else {
+                currentData.index -= 1;
+                currentData.items = removeItemFromArray(currentData.items, id);
+                setDataToLocalStorage(currentData);
+            }
+            categorizedItems.removeItem(id);
         }
-        categorizedItems.removeItem(id)
     }
+
 }
 //Utility methods- this will return a new array
 function removeItemFromArray(array, id) {
@@ -287,13 +290,11 @@ function toMMDDYYYYForComparing(date) {
     return new Date(dateInMMDDYYYY);
 }
 //***********BOSTRAP MODAL AND THEIR OPERATIONS************ */
-//When users click on the items on the left panel 
-$('.category').on('click', '.openModal', function() {
+function DisplayDataInModal(isModalRefresh, category, filter) {
     var currentData = showData();
     if (currentData) {
         var dataToBeBound = null;
-        var category = $(this).attr('data-category');
-        var filter = $(this).attr('data-filter');
+
         if (category == "1") {
             //this is for importance
             var allImportantData = searchByImportance(currentData.items);
@@ -345,25 +346,42 @@ $('.category').on('click', '.openModal', function() {
             alert("no category found");
         }
         if (dataToBeBound.length > 0) {
-            bindDataToModal(dataToBeBound);
+            bindDataToModal(dataToBeBound, isModalRefresh, category, filter);
         } else {
-            alert("No data to display");
+
+            if (isModalRefresh) {
+                $('#toDoModal').modal('hide');
+            } else {
+                alert("No data to display");
+            }
+
+        }
+    } else {
+
+        if (isModalRefresh) {
+            $('#toDoModal').modal('hide');
+        } else {
+            alert("No data found in your system");
         }
 
-
-    } else {
-        alert("No data found in your system");
     }
-
-
-
+}
+//When users click on the items on the left panel 
+$('.category').on('click', '.openModal', function() {
+    var category = $(this).attr('data-category');
+    var filter = $(this).attr('data-filter');
+    DisplayDataInModal(false, category, filter);
 });
 $('#todoModal').on('hidden.bs.modal', function() {
     $('#md-todoList ul.list-group').empty();
 });
 //this will create a modal and bind the incoming data to it
-function bindDataToModal(data) {
+function bindDataToModal(data, isModalRefresh, category, filter) {
     $('#md-todoList ul.list-group').empty();
+    $('#md-todoList #categoryAndFilter').attr('data-category', "");
+    $('#md-todoList #categoryAndFilter').attr('data-filter', "");
+    $('#md-todoList #categoryAndFilter').attr('data-category', category);
+    $('#md-todoList #categoryAndFilter').attr('data-filter', filter);
     //populate the recent data
     $.each(data, function(index, value) {
         var importanceClass = "";
@@ -383,6 +401,7 @@ function bindDataToModal(data) {
             //no class
         }
 
+
         $('#md-todoList ul.list-group').append('<li class="list-group-item ' + importanceClass + '"><label class="form-check-label main ' + completed + '">' +
             '<input data-id="' + value.id + '" type="checkbox" class="form-check-input changeStatus" value="" ' + checked + '>' + value.name + '<span class="checkmark"></span></label><i data-id="' + value.id +
             '"  class="fa fa-trash float-right trash">' +
@@ -390,7 +409,10 @@ function bindDataToModal(data) {
 
 
     });
-    $('#toDoModal').modal('show');
+    if (!isModalRefresh) {
+        $('#toDoModal').modal('show');
+    }
+
 }
 
 //search between dates
@@ -404,7 +426,32 @@ function searchBetweenDates(currentData, fromDate, toDate) {
     }
     return result;
 }
+//on delete event in the modal
+$("#md-todoList").on('click', '.trash', function() {
+    var index = parseInt($(this).attr("data-id"));
+    if (confirm("Are you sure you would like to delete this item?")) {
+        deleteItem(index);
+        $('#notification').data('kendoNotification').show({ message: 'ToDo item has been deleted.' })
+        rapidRefresh();
+        var category = $('#md-todoList #categoryAndFilter').attr('data-category');
+        var filter = $('#md-todoList #categoryAndFilter').attr('data-filter');
+        if (category == "3") {
+            location.reload();
+        } else {
+            DisplayDataInModal(true, category, filter);
+        }
 
+    }
+
+});
+//Chaneg status within the modal
+$("#md-todoList").on('change', '.changeStatus', function() {
+    var currentData = showData();
+    var index = parseInt($(this).attr("data-id"));
+    changeStatusOfAToDo(index);
+    $('#notification').data('kendoNotification').show({ message: "Completion status changed" })
+    rapidRefresh();
+});
 
 //search by predefined dates
 function searchByPredefinedDates(currentData) {
@@ -423,7 +470,7 @@ function searchByPredefinedDates(currentData) {
             var endDate = getStartAndEndDate("thisweek").end;
             return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= startDate && toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= endDate;
         });
-        result.lastWeek = currentData.filter(function(element, index) {
+        result.nextWeek = currentData.filter(function(element, index) {
 
             var startDate = getStartAndEndDate("nextweek").start;
             var endDate = getStartAndEndDate("nextweek").end;
