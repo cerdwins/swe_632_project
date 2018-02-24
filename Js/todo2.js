@@ -89,12 +89,12 @@ function initialLateStateVariables() {
         var info = this.parentElement.children[0].innerText;
         var date = this.parentElement.children[2].innerText;
         date = date.replace("Due Date: ", "");
-        if (!confirm('Are you sure you want to delete: ' + info + ' on ' + date +'?')) return;
+        if (!confirm('Are you sure you want to delete to do with ' + info + ' importance todo for ' + date + '?')) return;
         var correctNode = this.parentElement.children[0].children[0];
         var id = $(correctNode).data("internalid");
         deleteItem(id);
         rapidRefresh();
-        $('#notification').data('kendoNotification').show({ message: '' + info + ' has been deleted.' });
+        $('#notification').data('kendoNotification').show({ message: 'todo list with ' + info + ' importance has been deleted.' });
     })
 }
 
@@ -332,18 +332,22 @@ function DisplayDataInModal(isModalRefresh, category, filter) {
             //this is for custom search
 
             //check to see if any of the fields are empty
-            //todate cannot be smaller than the 
-            var fromDate = $("#fromDate").data("kendoDatePicker").value();
-            var toDate = $("#toDate").data("kendoDatePicker").value();
-            console.log(fromDate + ":" + toDate);
-            if (fromDate && toDate) {
-                if (toDate < fromDate) {
-                    $('#notification').data('kendoNotification').show('to date has to be bigger.Try again', "error");
-                } else {
-                    dataToBeBound = searchBetweenDates(currentData.items, fromDate, toDate);
-                }
+            if ($("#fromDate").val() == "" || $("#toDate").val() == "") {
+                $('#notification').data('kendoNotification').show('Missing From or To date.Try again', "error");
             } else {
-                $('#notification').data('kendoNotification').show('Missing from or to date.Try again', "error");
+
+                //todate cannot be smaller than the 
+                var fromDate = $("#fromDate").data("kendoDatePicker").value();
+                var toDate = $("#toDate").data("kendoDatePicker").value();
+                if (fromDate && toDate) {
+                    if (toDate < fromDate) {
+                        $('#notification').data('kendoNotification').show('“From” date must be prior to the “To” date.Try again', "error");
+                    } else {
+                        dataToBeBound = searchBetweenDates(currentData.items, fromDate, toDate);
+                    }
+                } else {
+                    $('#notification').data('kendoNotification').show('Date entered is not valid.Try again', "error");
+                }
             }
         } else {
             alert("no category found");
