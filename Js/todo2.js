@@ -1,10 +1,6 @@
 $(document).ready(function() {
-    //moves something to the completed bin or the uncompleted bin
-    $(".form-check-input").is(':checked', function() {
 
-    });
-
-    var notification = $('#notification').kendoNotification({
+    $('#notification').kendoNotification({
         position: {
             top: 30
         },
@@ -14,7 +10,7 @@ $(document).ready(function() {
             template: $('#notification-template').html()
         }],
         height: 50
-    }).data('kendoNotification');
+    });
 
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
@@ -29,9 +25,20 @@ $(document).ready(function() {
 
     $("#toDate, #fromDate").kendoDatePicker({
         // display month and year in the input
-        format: "MM/dd/yyyy",
+        format: "MM/dd/yyyy"
     }).kendoMaskedTextBox({ mask: '00/00/0000' });
 
+    $("#todoDueDate").kendoDatePicker({
+        // display month and year in the input
+        format: "MM/dd/yyyy",
+        change: function() {
+            if (this.value()) {
+                calendar.value(this.value());
+            } else {
+                this.value(calendar.value());
+            }
+        }
+    }).kendoMaskedTextBox({ mask: '00/00/0000' });
     /******************EVENT HANDLING PARTS ONLY********************** */
 
     //Display selected date on the calendar on load
@@ -46,7 +53,8 @@ $(document).ready(function() {
         //Gather form data
         var dueDate = calendar.value();
         var formData = $('#create-todo-item-form').serializeArray();
-        var name = document.getElementById("simple-input").value;
+        var $nameInput = $('#simple-input');
+        var name = $nameInput.val();
         var importance = formData[0].value;
         if (name) {
             addToDoList(name, dueDate, importance, false);
@@ -54,10 +62,21 @@ $(document).ready(function() {
             $('#createdAlert').removeClass('hide').addClass('show');
             rapidRefresh();
             notify('Your ToDo item has been added');
+            $nameInput.removeClass('invalid-input');
         } else {
             notifyError('ToDo Name must be specified.');
+            $nameInput.addClass('invalid-input');
         }
 
+    });
+
+    $('#simple-input').change(function() {
+        var $input = $(this);
+        if ($input.is('.invalid-input')) {
+            if ($input.val()) {
+                $input.removeClass('invalid-input');
+            }
+        }
     });
 
     rapidRefresh();
@@ -153,14 +172,17 @@ function toMMDDYYYYString(date) {
 function createLineItemInToDoList(data) {
     //var splitted = data.dueDate.split(":");
     //data.dueDate = splitted[0];
-    if (data.importance == VERY_HIGH_IMPORTANCE) {
-        var listType = "veryHighList";
-    }
-    if (data.importance == HIGH_IMPORTANCE) {
-        var listType = "highList";
-    }
-    if (data.importance == NORMAL_IMPORTANCE) {
-        var listType = "normalList";
+    var listType;
+    switch (data.importance) {
+        case VERY_HIGH_IMPORTANCE:
+            listType = "veryHighList";
+            break;
+        case HIGH_IMPORTANCE:
+            listType = "highList";
+            break;
+        case NORMAL_IMPORTANCE:
+            listType = "normalList";
+            break;
     }
 
     if (data.isCompleted) {
@@ -186,7 +208,7 @@ function createLineItemInToDoList(data) {
 
 //to Display the value of the calendar on the text
 function displayCalendarValue(val) {
-    $("#selected-date").text(val);
+    $('#todoDueDate').data('kendoDatePicker').value(val);
 }
 
 //Class to create todo Object
@@ -394,7 +416,7 @@ function displayDataInModal(isModalRefresh, category, filter) {
         if (isModalRefresh) {
             $('#toDoModal').modal('hide');
         } else {
-            alert("No ToDo items have been created.");
+            notify("No ToDo items have been created yet.");
         }
     }
 }

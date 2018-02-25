@@ -23,6 +23,10 @@
     height: 60px;
 }
 
+input.invalid-input {
+    border-color: #dc3545;
+}
+
 #deleteStorage {
     position: absolute;
     right: 1%;
