@@ -35,7 +35,8 @@ $(document).ready(function() {
             if (this.value()) {
                 calendar.value(this.value());
             } else {
-                this.value(calendar.value());
+                notifyError("Date entered is invalid. Please try again.");
+                //this.value(calendar.value());
             }
         }
     }).kendoMaskedTextBox({ mask: '00/00/0000' });
@@ -54,20 +55,32 @@ $(document).ready(function() {
         var dueDate = calendar.value();
         var formData = $('#create-todo-item-form').serializeArray();
         var $nameInput = $('#simple-input');
+        var $dateInput = $('#todoDueDate');
         var name = $nameInput.val();
+        var date = $dateInput.data('kendoDatePicker').value();
         var importance = formData[0].value;
-        if (name) {
+        var validated = true;
+        if (! name) {
+            notifyError('ToDo Name must be specified.');
+            $nameInput.addClass('invalid-input');
+            validated = false;
+        } else {
+            $nameInput.removeClass('invalid-input');
+        }
+        if (! date) {
+            notifyError('Please enter a valid date or select a date from the calendar.');
+            $dateInput.closest('.k-picker-wrap').addClass('invalid-input');
+            validated = false;
+        } else {
+            $dateInput.closest('.k-picker-wrap').removeClass('invalid-input');
+        }
+        if (validated) {
             addToDoList(name, dueDate, importance, false);
             //reload the entire page
             $('#createdAlert').removeClass('hide').addClass('show');
             rapidRefresh();
             notify('Your ToDo item has been added');
-            $nameInput.removeClass('invalid-input');
-        } else {
-            notifyError('ToDo Name must be specified.');
-            $nameInput.addClass('invalid-input');
         }
-
     });
 
     $('#simple-input').change(function() {
@@ -407,7 +420,7 @@ function displayDataInModal(isModalRefresh, category, filter) {
                 if (isModalRefresh) {
                     $('#toDoModal').modal('hide');
                 } else {
-                    notify("No ToDo items entered for the selection.");
+                    notify("No ToDo items found for this selection.");
                 }
             }
         }
