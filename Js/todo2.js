@@ -13,7 +13,6 @@ $(document).ready(function() {
             type: 'info',
             template: $('#notification-template').html()
         }],
-        width: 300,
         height: 50
     }).data('kendoNotification');
 
@@ -27,16 +26,11 @@ $(document).ready(function() {
             displayCalendarValue(dateSelected);
         }
     });
-    $("#fromDate").kendoDatePicker({
 
+    $("#toDate, #fromDate").kendoDatePicker({
         // display month and year in the input
         format: "MM/dd/yyyy",
-    });
-    $("#toDate").kendoDatePicker({
-
-        // display month and year in the input
-        format: "MM/dd/yyyy",
-    });
+    }).kendoMaskedTextBox({ mask: '00/00/0000' });
 
     /******************EVENT HANDLING PARTS ONLY********************** */
 
@@ -61,7 +55,7 @@ $(document).ready(function() {
             rapidRefresh();
             notify('Your ToDo item has been added');
         } else {
-            notifyError('Todo Name must be specified.');
+            notifyError('ToDo Name must be specified.');
         }
 
     });
@@ -363,14 +357,18 @@ function displayDataInModal(isModalRefresh, category, filter) {
                 //this is for custom search
 
                 //check to see if any of the fields are empty
-                if ($("#fromDate").val() == "" || $("#toDate").val() == "") {
+                if ($("#fromDate").val() === "" || $("#toDate").val() === "") {
                     notifyError('Missing From or To date. Please try again');
                 } else {
-                    //todate cannot be smaller than the
+                    //to date cannot be smaller than the from date
                     var fromDate = $("#fromDate").data("kendoDatePicker").value();
                     var toDate = $("#toDate").data("kendoDatePicker").value();
-                    if (toDate < fromDate) {
-                        notifyError('“From” date must be prior to the “To” date. Please try again')
+                    if (! fromDate) {
+                        notifyError('Please enter a valid From date.');
+                    } else if (! toDate) {
+                        notifyError('Please enter a valid To date.');
+                    } else if (toDate < fromDate) {
+                        notifyError('“From” date must be prior to the “To” date. Please try again.')
                     } else {
                         dataToBeBound = searchBetweenDates(currentData.items, fromDate, toDate);
                     }
@@ -387,7 +385,7 @@ function displayDataInModal(isModalRefresh, category, filter) {
                 if (isModalRefresh) {
                     $('#toDoModal').modal('hide');
                 } else {
-                    alert("No data to display");
+                    notify("No ToDo items entered for the selection.");
                 }
             }
         }
@@ -396,9 +394,8 @@ function displayDataInModal(isModalRefresh, category, filter) {
         if (isModalRefresh) {
             $('#toDoModal').modal('hide');
         } else {
-            alert("No data found in your system");
+            alert("No ToDo items have been created.");
         }
-
     }
 }
 //When users click on the items on the left panel 
