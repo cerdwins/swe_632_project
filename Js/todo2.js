@@ -465,7 +465,7 @@ function bindDataToModal(data, isModalRefresh, category, filter) {
             case HIGH_IMPORTANCE:
                 importanceClass = "highList";
                 break;
-            case HIGH_IMPORTANCE:
+            case NORMAL_IMPORTANCE:
                 importanceClass = "normalList";
                 break;
         }
