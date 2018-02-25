@@ -600,18 +600,6 @@ var categorizedItems = (function() {
 
     var currentData = showData() || { items: [] };
 
-    kendo.data.binders.slide = kendo.data.Binder.extend({
-        refresh: function() {
-            var value = this.bindings["slide"].get();
-
-            if (value) {
-                $(this.element).slideDown();
-            } else {
-                $(this.element).slideUp();
-            }
-        }
-    });
-
     var dataModel = kendo.data.Model.define({
         id: 'id',
         fields: {
