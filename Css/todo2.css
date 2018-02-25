@@ -23,7 +23,7 @@
     height: 60px;
 }
 
-input.invalid-input {
+.k-picker-wrap.invalid-input, input.invalid-input {
     border-color: #dc3545;
 }
 
