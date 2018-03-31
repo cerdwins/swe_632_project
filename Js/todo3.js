@@ -102,7 +102,8 @@ var VERY_HIGH_IMPORTANCE = 'Very High',
 var searchCategory = {
     BY_IMPORTANCE: '1',
     BY_DATE: '2',
-    SEARCH: '3'
+    SEARCH: '3',
+    BY_CAL: '4'
 };
 
 var dateCategory = {
@@ -744,3 +745,16 @@ var categorizedItems = (function() {
         }
     }
 }());
+
+
+$(document).ready(function(){
+    $(".k-link").dblclick(function(){
+        displayDataInModal(false, "4", "custom")
+    });
+    $(".k-link").click(function(){
+        $(".k-link").dblclick(function(){
+            displayDataInModal(false, "4", "custom")
+        });
+    })
+});
+
