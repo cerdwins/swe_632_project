@@ -93,7 +93,6 @@ $(document).ready(function() {
     });
 
     rapidRefresh();
-
 });
 
 var VERY_HIGH_IMPORTANCE = 'Very High',
@@ -111,6 +110,12 @@ var dateCategory = {
     THIS_WEEK: 'thisweek',
     NEXT_WEEK: 'nextweek',
     THIS_MONTH: 'thismonth'
+};
+
+var searchType = {
+    DAY: 'day',
+    MONTH: 'month',
+    CUSTOM: 'custom'
 };
 
 //updates and refreshes the todo list
@@ -343,76 +348,89 @@ function notify(message) {
 function notifyError(message) {
     $('#notification').data('kendoNotification').error(message);
 }
-//***********BOSTRAP MODAL AND THEIR OPERATIONS************ */
+
+var searchActions = { };
+searchActions[searchCategory.BY_IMPORTANCE] = function(items, filter) {
+    var allImportantData = searchByImportance(items);
+    switch (filter) {
+        case "veryhigh":
+            return allImportantData.veryHigh;
+        case "high":
+            return allImportantData.high;
+        case "normal":
+            return allImportantData.normal;
+            break;
+        default:
+            alert("no filter found");
+            return null;
+    }
+};
+
+searchActions[searchCategory.BY_DATE] = function(items, filter) {
+    //this is for predefined dates
+    var allDatesData = searchByPredefinedDates(items);
+    switch (filter) {
+        case dateCategory.TODAY:
+            return allDatesData.today;
+        case dateCategory.THIS_WEEK:
+            return allDatesData.thisWeek;
+        case dateCategory.NEXT_WEEK:
+            return allDatesData.nextWeek;
+        case dateCategory.THIS_MONTH:
+            return allDatesData.thisMonth;
+        default:
+            alert("no filter found");
+            return null;
+    }
+};
+
+searchActions[searchCategory.SEARCH] = function(items, filter) {
+    var dateUtils = kendo.date;
+    var fromDate, toDate;
+    var calendar = $("#mainCalendar").data('kendoCalendar');
+    switch (filter) {
+        case searchType.DAY:
+            fromDate = toDate = calendar.value();
+            break;
+        case searchType.MONTH:
+            var selectedDate = calendar.current();
+            fromDate = dateUtils.firstDayOfMonth(selectedDate);
+            toDate = dateUtils.lastDayOfMonth(selectedDate);
+            break;
+        case searchType.CUSTOM:
+            //check to see if any of the fields are empty
+            if ($("#fromDate").val() === "" || $("#toDate").val() === "") {
+                notifyError('Missing From or To date. Please try again');
+            } else {
+                //to date cannot be smaller than the from date
+                fromDate = $("#fromDate").data("kendoDatePicker").value();
+                toDate = $("#toDate").data("kendoDatePicker").value();
+                if (! fromDate) {
+                    notifyError('Please enter a valid From date.');
+                } else if (! toDate) {
+                    notifyError('Please enter a valid To date.');
+                } else if (toDate < fromDate) {
+                    notifyError('“From” date must be prior to the “To” date. Please try again.')
+                }
+            }
+            break;
+    }
+    return searchBetweenDates(items, fromDate, toDate);
+};
+
+//***********BOOTSTRAP MODAL AND THEIR OPERATIONS************ */
 function displayDataInModal(isModalRefresh, category, filter) {
     var currentData = showData();
     if (currentData) {
+        var action = searchActions[category];
+        console.log('category', category);
         var dataToBeBound = null;
-        switch (category) {
-            case searchCategory.BY_IMPORTANCE:
-                //this is for importance
-                var allImportantData = searchByImportance(currentData.items);
-                switch (filter) {
-                    case "veryhigh":
-                        dataToBeBound = allImportantData.veryHigh;
-                        break;
-                    case "high":
-                        dataToBeBound = allImportantData.high;
-                        break;
-                    case "normal":
-                        dataToBeBound = allImportantData.normal;
-                        break;
-                    default:
-                        alert("no filter found");
-                        break;
-                }
-                break;
-            case searchCategory.BY_DATE:
-                //this is for predefined dates
-                var allDatesData = searchByPredefinedDates(currentData.items);
-                switch (filter) {
-                    case dateCategory.TODAY:
-                        dataToBeBound = allDatesData.today;
-                        break;
-                    case dateCategory.THIS_WEEK:
-                        dataToBeBound = allDatesData.thisWeek;
-                        break;
-                    case dateCategory.NEXT_WEEK:
-                        dataToBeBound = allDatesData.nextWeek;
-                        break;
-                    case dateCategory.THIS_MONTH:
-                        dataToBeBound = allDatesData.thisMonth;
-                        break;
-                    default:
-                        alert("no filter found");
-                        break;
-                }
-                break;
-            case searchCategory.SEARCH:
-                //this is for custom search
-
-                //check to see if any of the fields are empty
-                if ($("#fromDate").val() === "" || $("#toDate").val() === "") {
-                    notifyError('Missing From or To date. Please try again');
-                } else {
-                    //to date cannot be smaller than the from date
-                    var fromDate = $("#fromDate").data("kendoDatePicker").value();
-                    var toDate = $("#toDate").data("kendoDatePicker").value();
-                    if (!fromDate) {
-                        notifyError('Please enter a valid From date.');
-                    } else if (!toDate) {
-                        notifyError('Please enter a valid To date.');
-                    } else if (toDate < fromDate) {
-                        notifyError('“From” date must be prior to the “To” date. Please try again.')
-                    } else {
-                        dataToBeBound = searchBetweenDates(currentData.items, fromDate, toDate);
-                    }
-                }
-                break;
-            default:
-                alert("no category found");
-                break;
+        if (action) {
+            dataToBeBound = action(currentData.items, filter);
+        } else {
+            alert("no category found");
         }
+
         if (dataToBeBound) {
             if (dataToBeBound.length > 0) {
                 bindDataToModal(dataToBeBound, isModalRefresh, category, filter);
