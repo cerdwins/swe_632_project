@@ -104,37 +104,22 @@
                     <li class="list-group-item">#: name # <span class="small-text">#: kendo.toString(dueDate, 'd') #</span></li>
                 </script>
             </div>
-            <div id="searchDiv" class="category">
-                <p class="card-text"><i class="fa fa-search"></i>Custom Search</p>
-                <span>From:</span>
-                <input id="fromDate" value="" placeholder="mm/dd/yyyy" title="datepicker" style="width: 100%" />
-                <span>To:</span>
-                <input id="toDate" value="" placeholder="mm/dd/yyyy" title="datepicker" style="width: 100%" /><br/>
-                <a class="btn btn-main openModal" data-category="3" data-filter="custom" id="search">Search</a>
-            </div>
         </div>
         <div class=" col-sm-9 bg-white padding-all-one">
             <div class="row">
-                <div class="col-sm-6" id="upper-section">
+                <div class="col-sm-6">
                     <h3><i class="fa fa-list-alt"></i> ToDo list in three simple steps</h3>
                     <div class="small-spacer"></div>
                     <div>
-                        <div><strong><i class="fa fa-check"></i>Step 1</strong>: Pick a Date </div>
-                        <div><strong><i class="fa fa-check"></i>Step 2</strong>: Enter ToDo Item </div>
-                        <div><strong><i class="fa fa-check"></i>Step 3</strong>: Create</div>
                     </div>
-                    <div class="small-spacer"></div>
-                    <div id="mainCalendar"></div>
-
-                </div>
-                <div class="col-sm-6">
-                    <div class="spacer"></div>
                     <div id="todoItem">
                         <form id="create-todo-item-form" action="#">
+                            <div><strong><i class="fa fa-check"></i>Step 1</strong>: Pick a Date </div>
                             <p>
                                 <label for="todoDueDate"><i class="fa fa-calendar"></i>Currently selected date on the calendar:</label>
                                 <input id="todoDueDate" value="" placeholder="mm/dd/yyyy" title="datepicker" style="width: 150px">
                             </p>
+                            <div><strong><i class="fa fa-check"></i>Step 2</strong>: Enter ToDo Item </div>
                             <input id="simple-input" maxlength="60" accesskey="n" type="text" placeholder="Enter todo name here. For example, grocery shopping" class="k-textbox" style="width: 100%;" required/>
                             <div class="small-spacer"></div>
                             <div class="small-spacer"></div>
@@ -142,7 +127,7 @@
                             <div class="small-spacer"></div>
                             <label name="radio-importance" class="radio-inline very-high-importance">
                                   <input class="radio" type="radio" name="importance" value="Very High">Very High
-                                </label>
+                            </label>
                             <label name="radio-importance" class="radio-inline high-importance">
                                   <input class="radio" type="radio" name="importance" value="High">High
                                 </label>
@@ -151,14 +136,45 @@
                                 </label>
                             <div class="small-spacer"></div>
                             <div class="small-spacer">
+                                <div><strong><i class="fa fa-check"></i>Step 3</strong>: Create</div>
                                 <button type="submit" id="create-todo-item" href="#" class="btn btn-main">Create ToDo Item</button>
                             </div>
                         </form>
-
                     </div>
                 </div>
+                <div class="col-sm-6" id="upper-section">
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-search"></i>Search the Calendar
+                        </a>
+                        <div class="dropdown-menu category">
+                            <a class="small-text link dropdown-item openModal" data-filter="day" data-category="3">
+                                <i class="fa fa-search"></i>Selected Day</span>
+                            </a>
+                            <a class="small-text link dropdown-item openModal" data-filter="month" data-category="3">
+                                <i class="fa fa-search"></i>Selected Month</span>
+                            </a>
+                            <a class="small-text link dropdown-item openModal" data-filter="custom" data-category="3">
+                                <i class="fa fa-search"></i>Custom Search</span>
+                            </a>
+                            <!--
+                            <div>
+                                <span style="width: 40px">From:</span>
+                                <input id="fromDate" value="" placeholder="mm/dd/yyyy" title="datepicker" style="width: 100%" />
+                            </div>
+                            <div class="small-spacer"></div>
+                            <div>
+                                <span >To:</span>
+                                <input id="toDate" value="" placeholder="mm/dd/yyyy" title="datepicker" style="width: 100%" /><br/>
+                            </div>
+                            <a class="btn btn-main openModal" data-category="3" data-filter="custom" id="search">Search</a>
+                            -->
+                        </div>
+                    </div>
+                    <div class="small-spacer"></div>
+                    <div id="mainCalendar"></div>
+                </div>
             </div>
-
 
             <hr class="featurette-divider">
             <div class="small-spacer"></div>
@@ -185,21 +201,14 @@
                         <div class="tab-content">
                             <div class="tab-pane container" id="completed">
                                 <ul class="list-group" id="completedList">
-
                                 </ul>
                             </div>
                             <div class="tab-pane container active show" id="notCompleted">
-
                             </div>
-
-
                         </div>
-
                     </div>
                 </div>
-
             </div>
-
         </div>
     </div>
     <div id="notification"></div>
@@ -211,7 +220,7 @@
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title">Todo Lists</h4>
+                    <h4 class="modal-title">ToDo Lists</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
