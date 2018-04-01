@@ -214,3 +214,11 @@ input.invalid-input {
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
 }
+
+.hidden {
+    display: none;
+}
+
+.center-text {
+    text-align: center;
+}

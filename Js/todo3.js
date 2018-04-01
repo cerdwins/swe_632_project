@@ -20,12 +20,18 @@ $(document).ready(function() {
         change: function() {
             var dateSelected = toMMDDYYYY(this.value());
             displayCalendarValue(dateSelected);
+        },
+        navigate: function() {
+            $(".k-link").off('dblclick').dblclick(function(){
+                displayDataInModal(false, "4", "custom")
+            });
         }
     });
 
     $("#toDate, #fromDate").kendoDatePicker({
         // display month and year in the input
-        format: "MM/dd/yyyy"
+        format: "MM/dd/yyyy",
+        change: filterModal
     }).kendoMaskedTextBox({ mask: '00/00/0000' });
 
     $("#todoDueDate").kendoDatePicker({
@@ -92,17 +98,101 @@ $(document).ready(function() {
         }
     });
 
+    $('[name=importance-filter]').change(filterModal);
+    $('#text-filter').on('keyup', filterModal);
+
+    $('#toggle-filters-btn').click(function() {
+        var toggleOff = $(this).val() === 'on';
+        toggleFilters(! toggleOff);
+        if (toggleOff) {
+            var currentData = showData();
+            bindDataToModal(currentData.items, true);
+        }
+    });
+
+    $('#search-link').click(function() {
+        var currentData = showData();
+        if (currentData && currentData.items) {
+            clearFilters();
+            bindDataToModal(currentData.items, false);
+            $('#toDoModal').modal('show');
+        } else {
+            notify('No ToDo items have been create yet.');
+        }
+    });
+
+    //When users click on the items on the left panel
+    $('.category').on('click', '.openModal', function() {
+        var data = $(this).data();
+        displayDataInModal(false, data.category, data.filter);
+    });
+
+    $('#todoModal').on('hidden.bs.modal', function() {
+        $('#md-todoList ul.list-group').empty();
+    });
+
     rapidRefresh();
 });
+
+function toggleFilters(filtersOn) {
+    var $button = $('#toggle-filters-btn');
+    if (filtersOn) {
+        $('#modal-filters').show(200);
+        $button.val('on');
+    } else {
+        clearFilters();
+        $('#modal-filters').hide(200);
+        $button.val('off');
+    }
+    $('#toggle-filters-btn').text(filtersOn ? 'Hide Filters' : 'Show Filters');
+}
+
+function clearFilters() {
+    $('[name=importance-filter]').prop('checked', false);
+    $('#text-filter').val('');
+    $('#fromDate').data('kendoDatePicker').value(null);
+    $('#toDate').data('kendoDatePicker').value(null);
+}
+
+function filterModal(isModalRefresh) {
+    isModalRefresh = typeof isModalRefresh === 'undefined' ? false : isModalRefresh;
+    toggleFilters(true);
+    var currentData = showData();
+    if (currentData.items) {
+        var filteredItems = currentData.items;
+        var importanceFilters = [];
+        $('[name=importance-filter]').map(function() {
+            var $this = $(this);
+            if ($this.prop('checked')) {
+                importanceFilters.push($this.val());
+            }
+        });
+        if (importanceFilters.length) {
+            filteredItems = filterByImportance(importanceFilters, filteredItems);
+        }
+        var textFilter = $('#text-filter').val();
+        if (textFilter) {
+            filteredItems = filterByText(textFilter, filteredItems);
+        }
+        var fromDate = $('#fromDate').data('kendoDatePicker').value(),
+            toDate = $('#toDate').data('kendoDatePicker').value();
+        if (fromDate && toDate) {
+            filteredItems = searchBetweenDates(filteredItems, fromDate, toDate);
+        }
+        bindDataToModal(filteredItems, isModalRefresh);
+    }
+
+    $('#toDoModal').on('hidden.bs.modal', clearFilters);
+}
 
 var VERY_HIGH_IMPORTANCE = 'Very High',
     HIGH_IMPORTANCE = 'High',
     NORMAL_IMPORTANCE = 'Normal';
 
 var importanceClass = { };
-importanceClass[VERY_HIGH_IMPORTANCE] = "veryHighList";
-importanceClass[HIGH_IMPORTANCE] = "highList";
-importanceClass[NORMAL_IMPORTANCE] = "normalList";
+importanceClass[VERY_HIGH_IMPORTANCE]   = "veryHighList";
+importanceClass[HIGH_IMPORTANCE]        = "highList";
+importanceClass[NORMAL_IMPORTANCE]      = "normalList";
 
 var searchCategory = {
     BY_IMPORTANCE: '1',
@@ -134,29 +224,31 @@ function rapidRefresh() {
 
 //moves something to the completed bin or the uncompleted bin
 function initialLateStateVariables() {
-    $(".form-check-input").change(function() {
+    $(".form-check-input").off('change').change(function() {
         var id = $(this).data("internalid");
         changeStatusOfAToDo(id);
         rapidRefresh();
     });
-    $(".trash").click(function() {
-        var info = this.parentElement.children[0].innerText;
-        var date = this.parentElement.children[2].innerText;
-        date = date.replace("Due Date: ", "");
-        if (!confirm('Are you sure you want to delete to do with ' + info + ' importance todo for ' + date + '?')) return;
-        var correctNode = this.parentElement.children[0].children[0];
-        var id = $(correctNode).data("internalid");
+    $("#display-section").off('click').on('click', '.trash', function() {
+        var id = $(this).data().id;
         deleteItem(id);
+    });
+}
+
+function deleteItem(id) {
+    var item = findToDoItemById(parseInt(id));
+    if (confirm('Are you sure you would like to delete this item? "' + item.name + '"')) {
+        deleteItemFromStorage(id);
+        notify('ToDo item has been deleted.');
         rapidRefresh();
-        notify('todo list with ' + info + ' importance has been deleted.');
-    })
+    }
 }
 
 //updates the counts above the ToDo list
 function updateToDoCounts() {
     var data = showData();
     if (data != null) {
-        $('.totalTodos').text(data.index);
+        $('.totalTodos').text(data.total);
         var completedData = data.items.filter(element => element.isCompleted);
 
         document.getElementById("completed-badge").innerText = completedData.length;
@@ -183,7 +275,6 @@ function showToDoList() {
         for (i = 0; i < currentData.items.length; i++) {
             createLineItemInToDoList(currentData.items[i]);
         }
-
     }
 }
 //convert to mm/dd/yyyy
@@ -238,9 +329,11 @@ function setDataToLocalStorage(data) {
 function addToDoList(name, dueDate, importance, isCompleted) {
     //get the local storage data // get the index of the highest item // add to the list //set the localstorage
     var currentData = getDataFromLocalStorage() || {
+        total: 0,
         index: 0,
         items: []
     };
+    currentData.total += 1;
     currentData.index += 1;
     var toDo = new Todo(currentData.index, name, dueDate, importance, isCompleted);
     currentData.items.push(toDo);
@@ -248,17 +341,29 @@ function addToDoList(name, dueDate, importance, isCompleted) {
     categorizedItems.addItem(toDo);
     $('#simple-input').val('');
 }
+
+function findToDoItemById(id) {
+    var data = showData();
+    if (data && data.items) {
+        return data.items.find(function(item) {
+            return item.id === id;
+        });
+    }
+    return null;
+}
+
 //Display all the data
 function showData() {
     return getDataFromLocalStorage();
 }
+
 //change from completedToNotCompletedAndViceVersa
 function changeStatusOfAToDo(id) {
     var i, len;
     //Search for the items
     var currentData = showData();
     //Check to see if there is any item in the storage
-    if (currentData && currentData.index > 0) {
+    if (currentData && currentData.total > 0) {
         for (i = 0, len = currentData.items.length; i < len; i++) {
             var item = currentData.items[i];
             if (item.id === id) {
@@ -269,6 +374,7 @@ function changeStatusOfAToDo(id) {
         }
     }
 }
+
 //delete entire storage
 $("#deleteStorage").click(function() {
     if (confirm("Are you sure you would like to remove all the data?")) {
@@ -279,15 +385,16 @@ $("#deleteStorage").click(function() {
     }
 
 });
+
 //Delete item from the storage
-function deleteItem(id) {
+function deleteItemFromStorage(id) {
     if (id) {
         var currentData = showData();
         if (currentData) {
-            if (currentData.index == 1) {
+            if (currentData.total == 1) {
                 localStorage.clear();
             } else {
-                currentData.index -= 1;
+                currentData.total -= 1;
                 currentData.items = removeItemFromArray(currentData.items, id);
                 setDataToLocalStorage(currentData);
             }
@@ -296,18 +403,18 @@ function deleteItem(id) {
     }
 
 }
+
 //Utility methods- this will return a new array
 function removeItemFromArray(array, id) {
     return array.filter(e => e.id !== id);
 }
-
-
 
 /*************DATE UTILITIES************/
 //convert to mm/dd/yyyy
 function toMMDDYYYY(date) {
     return kendo.toString(date, 'MM/dd/yyyy');
 }
+
 //convert to mm/dd/yyyy
 function toMMDDYYYYString(date) {
     var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
@@ -330,37 +437,49 @@ function notifyError(message) {
 
 var searchActions = { };
 searchActions[searchCategory.BY_IMPORTANCE] = function(items, filter) {
-    var allImportantData = searchByImportance(items);
     switch (filter) {
         case "veryhigh":
-            return allImportantData.veryHigh;
+            $('[name=importance-filter][value="Very High"]').prop('checked', true);
+            break;
         case "high":
-            return allImportantData.high;
+            $('[name=importance-filter][value="High"]').prop('checked', true);
+            break;
         case "normal":
-            return allImportantData.normal;
+            $('[name=importance-filter][value="Normal"]').prop('checked', true);
             break;
         default:
             alert("no filter found");
-            return null;
+            break;
     }
 };
 
 searchActions[searchCategory.BY_DATE] = function(items, filter) {
     //this is for predefined dates
-    var allDatesData = searchByPredefinedDates(items);
+    var dateUtils = kendo.date;
+    var fromDate, toDate, today = dateUtils.today();
     switch (filter) {
         case dateCategory.TODAY:
-            return allDatesData.today;
+            fromDate = toDate = today;
+            break;
         case dateCategory.THIS_WEEK:
-            return allDatesData.thisWeek;
+            fromDate = dateUtils.dayOfWeek(today, 0, -1);
+            toDate = dateUtils.dayOfWeek(today, 6, 1);
+            break;
         case dateCategory.NEXT_WEEK:
-            return allDatesData.nextWeek;
+            var nextSunday = dateUtils.addDays(today, 7 - today.getDay());
+            fromDate = nextSunday;
+            toDate = dateUtils.dayOfWeek(nextSunday, 6, 1);
+            break;
         case dateCategory.THIS_MONTH:
-            return allDatesData.thisMonth;
+            fromDate = dateUtils.firstDayOfMonth(today);
+            toDate = dateUtils.lastDayOfMonth(today);
+            break;
         default:
             alert("no filter found");
-            return null;
+            break;
     }
+    $('#fromDate').data('kendoDatePicker').value(fromDate);
+    $('#toDate').data('kendoDatePicker').value(toDate);
 };
 
 searchActions[searchCategory.SEARCH] = function(items, filter) {
@@ -380,26 +499,19 @@ searchActions[searchCategory.SEARCH] = function(items, filter) {
             var selectedDate = calendar.current();
             fromDate = dateUtils.firstDayOfMonth(selectedDate);
             toDate = dateUtils.lastDayOfMonth(selectedDate);
-            /*
-            //check to see if any of the fields are empty
-            if (! ($("#fromDate").val() && $("#toDate").val())) {
-                notifyError('Missing From or To date. Please try again');
-            } else {
-                //to date cannot be smaller than the from date
-                fromDate = $("#fromDate").data("kendoDatePicker").value();
-                toDate = $("#toDate").data("kendoDatePicker").value();
-                if (! fromDate) {
-                    notifyError('Please enter a valid From date.');
-                } else if (! toDate) {
-                    notifyError('Please enter a valid To date.');
-                } else if (toDate < fromDate) {
-                    notifyError('“From” date must be prior to the “To” date. Please try again.')
-                }
-            }
-            */
             break;
     }
-    return searchBetweenDates(items, fromDate, toDate);
+
+    $('#fromDate').data('kendoDatePicker').value(fromDate);
+    $('#toDate').data('kendoDatePicker').value(toDate);
+};
+
+
+searchActions[searchCategory.BY_CAL] = function() {
+    var date = $("#mainCalendar").data('kendoCalendar').value();
+    $('#fromDate').data('kendoDatePicker').value(date);
+    $('#toDate').data('kendoDatePicker').value(date);
+
 };
 
 //***********BOOTSTRAP MODAL AND THEIR OPERATIONS************ */
@@ -407,27 +519,13 @@ function displayDataInModal(isModalRefresh, category, filter) {
     var currentData = showData();
     if (currentData) {
         var action = searchActions[category];
-        console.log('category', category);
-        var dataToBeBound = null;
         if (action) {
-            dataToBeBound = action(currentData.items, filter);
+            action(currentData.items, filter);
+            filterModal();
         } else {
-            alert("no category found");
-        }
-
-        if (dataToBeBound) {
-            if (dataToBeBound.length > 0) {
-                bindDataToModal(dataToBeBound, isModalRefresh, category, filter);
-            } else {
-                if (isModalRefresh) {
-                    $('#toDoModal').modal('hide');
-                } else {
-                    notify("No ToDo items found for this selection.");
-                }
-            }
+            bindDataToModal(currentData.items, isModalRefresh);
         }
     } else {
-
         if (isModalRefresh) {
             $('#toDoModal').modal('hide');
         } else {
@@ -435,16 +533,6 @@ function displayDataInModal(isModalRefresh, category, filter) {
         }
     }
 }
-
-//When users click on the items on the left panel 
-$('.category').on('click', '.openModal', function() {
-    var data = $(this).data();
-    displayDataInModal(false, data.category, data.filter);
-});
-
-$('#todoModal').on('hidden.bs.modal', function() {
-    $('#md-todoList ul.list-group').empty();
-});
 
 var itemTemplate = kendo.template(
     '<li class="list-group-item #= importanceClass[importance] #">'
@@ -458,18 +546,28 @@ var itemTemplate = kendo.template(
     + '</li>');
 
 //this will create a modal and bind the incoming data to it
-function bindDataToModal(data, isModalRefresh, category, filter) {
+function bindDataToModal(data, isModalRefresh) {
     $('#md-todoList ul.list-group').empty();
-    var $categoryAndFilter = $('#md-todoList #categoryAndFilter');
-    $categoryAndFilter.attr('data-category', category).attr('data-filter', filter);
-    //populate the recent data
-    $.each(data, function(index, value) {
-        $('#md-todoList ul.list-group').append(itemTemplate(value));
-    });
+    if (data.length) {
+        $('#todo-item-list-row').show();
+        $('#no-data-message-row').hide();
+        //populate the recent data
+        $.each(data, function (index, value) {
+            $('#md-todoList ul.list-group').append(itemTemplate(value));
+        });
+    } else {
+        $('#todo-item-list-row').hide();
+        $('#no-data-message-row').show();
+    }
     if (!isModalRefresh) {
         $('#toDoModal').modal('show');
     }
 
+    $("#md-todoList").off('click').on('click', '.trash', function() {
+        var id = parseInt($(this).attr("data-id"));
+        deleteItem(id);
+        filterModal();
+    });
 }
 
 //search between dates
@@ -483,24 +581,8 @@ function searchBetweenDates(currentData, fromDate, toDate) {
     }
     return result;
 }
-//on delete event in the modal
-$("#md-todoList").on('click', '.trash', function() {
-    var index = parseInt($(this).attr("data-id"));
-    if (confirm("Are you sure you would like to delete this item?")) {
-        deleteItem(index);
-        notify('ToDo item has been deleted.');
-        rapidRefresh();
-        var category = $('#md-todoList #categoryAndFilter').attr('data-category');
-        var filter = $('#md-todoList #categoryAndFilter').attr('data-filter');
-        if (category === searchCategory.SEARCH) {
-            location.reload();
-        } else {
-            displayDataInModal(true, category, filter);
-        }
-    }
-});
 
-//Chaneg status within the modal
+//Change status within the modal
 $("#md-todoList").on('change', '.changeStatus', function() {
     var currentData = showData();
     var index = parseInt($(this).attr("data-id"));
@@ -575,20 +657,31 @@ function searchByImportance(currentData) {
     var result = { veryHigh: [], high: [], normal: [] };
     if (currentData) {
         result.veryHigh = currentData.filter(function(element) {
-            return element.importance == VERY_HIGH_IMPORTANCE;
+            return element.importance === VERY_HIGH_IMPORTANCE;
         });
         result.high = currentData.filter(function(element) {
-            return element.importance == HIGH_IMPORTANCE;
+            return element.importance === HIGH_IMPORTANCE;
         });
         result.normal = currentData.filter(function(element) {
-            return element.importance == NORMAL_IMPORTANCE;
+            return element.importance === NORMAL_IMPORTANCE;
         });
 
     }
     return result;
 }
 
+function filterByText(text, items) {
+    text = text.toLowerCase();
+    return items.filter(function(element) {
+        return element.name.toLowerCase().indexOf(text) > -1;
+    });
+}
 
+function filterByImportance(importanceTypes, items) {
+   return items.filter(function(element) {
+        return importanceTypes.indexOf(element.importance) > -1;
+   });
+}
 
 /**********MODAL DONE*************** */
 
@@ -699,6 +792,7 @@ var categorizedItems = (function() {
     kendo.bind($('#categorized-by-date'), byDate);
 
     return {
+
         addItem: function(item) {
             $.map(dataSources, function(ds) {
                 ds.add(item);
@@ -715,16 +809,4 @@ var categorizedItems = (function() {
         }
     }
 }());
-
-
-$(document).ready(function(){
-    $(".k-link").dblclick(function(){
-        displayDataInModal(false, "4", "custom")
-    });
-    $(".k-link").click(function(){
-        $(".k-link").dblclick(function(){
-            displayDataInModal(false, "4", "custom")
-        });
-    })
-});
 
