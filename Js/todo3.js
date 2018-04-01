@@ -110,6 +110,15 @@ $(document).ready(function() {
         }
     });
 
+    $('#clear-filters-btn').click(function() {
+        clearFilters();
+        var currentData = showData();
+        if (currentData && currentData.items) {
+            clearFilters();
+            bindDataToModal(currentData.items, false);
+        }
+    });
+
     $('#search-link').click(function() {
         var currentData = showData();
         if (currentData && currentData.items) {
@@ -140,7 +149,6 @@ function toggleFilters(filtersOn) {
         $('#modal-filters').show(200);
         $button.val('on');
     } else {
-        clearFilters();
         $('#modal-filters').hide(200);
         $button.val('off');
     }
