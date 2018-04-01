@@ -464,20 +464,7 @@ function bindDataToModal(data, isModalRefresh, category, filter) {
     $categoryAndFilter.attr('data-category', category).attr('data-filter', filter);
     //populate the recent data
     $.each(data, function(index, value) {
-        var importanceClass = "";
-        switch (value.importance.toLowerCase()) {
-            case VERY_HIGH_IMPORTANCE:
-                importanceClass = "veryHighList";
-                break;
-            case HIGH_IMPORTANCE:
-                importanceClass = "highList";
-                break;
-            case NORMAL_IMPORTANCE:
-                importanceClass = "normalList";
-                break;
-        }
-
-        $('#md-todoList ul.list-group').append(itemTemplate(data));
+        $('#md-todoList ul.list-group').append(itemTemplate(value));
     });
     if (!isModalRefresh) {
         $('#toDoModal').modal('show');
