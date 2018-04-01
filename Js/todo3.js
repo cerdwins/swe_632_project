@@ -99,6 +99,11 @@ var VERY_HIGH_IMPORTANCE = 'Very High',
     HIGH_IMPORTANCE = 'High',
     NORMAL_IMPORTANCE = 'Normal';
 
+var importanceClass = { };
+importanceClass[VERY_HIGH_IMPORTANCE] = "veryHighList";
+importanceClass[HIGH_IMPORTANCE] = "highList";
+importanceClass[NORMAL_IMPORTANCE] = "normalList";
+
 var searchCategory = {
     BY_IMPORTANCE: '1',
     BY_DATE: '2',
@@ -171,7 +176,7 @@ function emptyToDoList() {
 }
 
 
-//Creates the lists in the "Most Recent Todo Lists" area
+//Creates the lists in the "Most Recent Todo Items" area
 function showToDoList() {
     var currentData = showData();
     if (currentData != null) {
@@ -189,38 +194,11 @@ function toMMDDYYYYString(date) {
 
 //Creates a line item in the #list-group.  Use 1 Array Json Value
 function createLineItemInToDoList(data) {
-    //var splitted = data.dueDate.split(":");
-    //data.dueDate = splitted[0];
-    var listType;
-    switch (data.importance) {
-        case VERY_HIGH_IMPORTANCE:
-            listType = "veryHighList";
-            break;
-        case HIGH_IMPORTANCE:
-            listType = "highList";
-            break;
-        case NORMAL_IMPORTANCE:
-            listType = "normalList";
-            break;
-    }
 
+    var html = itemTemplate(data);
     if (data.isCompleted) {
-        var html = '<li class="list-group-item ' + listType + '">' +
-            '<label class="form-check-label completed-item main">' +
-            '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '" checked>' + data.name +
-            '<span class="checkmark"></span></label>' +
-            '<i class="fa fa-trash float-right trash"></i>' +
-            '<p class="small-text">Due Date: ' + toMMDDYYYYString(new Date(data.dueDate)) + '</p>' +
-            '</li>';
         $("#completedList").append(html);
     } else {
-        var html = '<li class="list-group-item ' + listType + '">' +
-            '<label class="form-check-label main">' +
-            '<input type="checkbox" class="form-check-input" data-internalid="' + data.id + '" data-completed="' + data.isCompleted + '" value="' + data.importance + '">' + data.name +
-            '<span class="checkmark"></span></label>' +
-            '<i class="fa fa-trash float-right trash"></i>' +
-            '<p class="small-text">Due Date: ' + toMMDDYYYYString(new Date(data.dueDate)) + '</p>' +
-            '</li>';
         $("#notCompleted").append(html);
     }
 }
@@ -399,8 +377,12 @@ searchActions[searchCategory.SEARCH] = function(items, filter) {
             toDate = dateUtils.lastDayOfMonth(selectedDate);
             break;
         case searchType.CUSTOM:
+            var selectedDate = calendar.current();
+            fromDate = dateUtils.firstDayOfMonth(selectedDate);
+            toDate = dateUtils.lastDayOfMonth(selectedDate);
+            /*
             //check to see if any of the fields are empty
-            if ($("#fromDate").val() === "" || $("#toDate").val() === "") {
+            if (! ($("#fromDate").val() && $("#toDate").val())) {
                 notifyError('Missing From or To date. Please try again');
             } else {
                 //to date cannot be smaller than the from date
@@ -414,6 +396,7 @@ searchActions[searchCategory.SEARCH] = function(items, filter) {
                     notifyError('“From” date must be prior to the “To” date. Please try again.')
                 }
             }
+            */
             break;
     }
     return searchBetweenDates(items, fromDate, toDate);
@@ -452,31 +435,36 @@ function displayDataInModal(isModalRefresh, category, filter) {
         }
     }
 }
+
 //When users click on the items on the left panel 
 $('.category').on('click', '.openModal', function() {
-    var category = $(this).attr('data-category');
-    var filter = $(this).attr('data-filter');
-    displayDataInModal(false, category, filter);
+    var data = $(this).data();
+    displayDataInModal(false, data.category, data.filter);
 });
+
 $('#todoModal').on('hidden.bs.modal', function() {
     $('#md-todoList ul.list-group').empty();
 });
+
+var itemTemplate = kendo.template(
+    '<li class="list-group-item #= importanceClass[importance] #">'
+    + '     <label class="form-check-label main #= isCompleted ? "completed-item" : "" #">'
+    + '         <input data-internalid="#= id #" data-completed="#= completed #" type="checkbox" '
+    + '             class="form-check-input changeStatus" value="#= importance #" #= isCompleted ? "checked" : "" #>'
+    + '           #= name #<span class="checkmark"></span>'
+    + '     </label>'
+    + '     <i data-id="#= id #"  class="fa fa-trash float-right trash">'
+    + '     </i><p class="small-text">Due Date: #= kendo.toString(new Date(dueDate), "MM/dd/yyyy") #</p>'
+    + '</li>');
+
 //this will create a modal and bind the incoming data to it
 function bindDataToModal(data, isModalRefresh, category, filter) {
     $('#md-todoList ul.list-group').empty();
-    $('#md-todoList #categoryAndFilter').attr('data-category', "");
-    $('#md-todoList #categoryAndFilter').attr('data-filter', "");
-    $('#md-todoList #categoryAndFilter').attr('data-category', category);
-    $('#md-todoList #categoryAndFilter').attr('data-filter', filter);
+    var $categoryAndFilter = $('#md-todoList #categoryAndFilter');
+    $categoryAndFilter.attr('data-category', category).attr('data-filter', filter);
     //populate the recent data
     $.each(data, function(index, value) {
         var importanceClass = "";
-        var completed = "";
-        var checked = "";
-        if (value.isCompleted) {
-            completed = "completed-item";
-            checked = "checked";
-        }
         switch (value.importance.toLowerCase()) {
             case VERY_HIGH_IMPORTANCE:
                 importanceClass = "veryHighList";
@@ -489,12 +477,7 @@ function bindDataToModal(data, isModalRefresh, category, filter) {
                 break;
         }
 
-        $('#md-todoList ul.list-group').append('<li class="list-group-item ' + importanceClass + '"><label class="form-check-label main ' + completed + '">' +
-            '<input data-id="' + value.id + '" type="checkbox" class="form-check-input changeStatus" value="" ' + checked + '>' + value.name + '<span class="checkmark"></span></label><i data-id="' + value.id +
-            '"  class="fa fa-trash float-right trash">' +
-            '</i><p class="small-text">Due Date: ' + toMMDDYYYYString(new Date(value.dueDate)) + '</p></li>');
-
-
+        $('#md-todoList ul.list-group').append(itemTemplate(data));
     });
     if (!isModalRefresh) {
         $('#toDoModal').modal('show');
