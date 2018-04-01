@@ -35,6 +35,10 @@
             <h4>TODO ITEMS (<span class="totalTodos">0</span>)
             </h4>
             <div class="small-spacer"></div>
+            <div>
+                <p class="card-text "><a href="#" id="search-link"><i class="fa fa-search"></i>Search ToDo Items</a></p>
+            </div>
+            <div class="small-spacer"></div>
             <div id="categorized-by-importance">
                 <p class="card-text "><i class="fa fa-exclamation-circle"></i>Categorized By Importance</p>
                 <div class="category padding-left-six ">
@@ -154,21 +158,6 @@
                             <a class="small-text link dropdown-item openModal" data-filter="month" data-category="3">
                                 <i class="fa fa-circle"></i>Selected Month</span>
                             </a>
-                            <a class="small-text link dropdown-item openModal" data-filter="custom" data-category="3">
-                                <i class="fa fa-circle"></i>Custom Search</span>
-                            </a>
-                            <!--
-                            <div>
-                                <span style="width: 40px">From:</span>
-                                <input id="fromDate" value="" placeholder="mm/dd/yyyy" title="datepicker" style="width: 100%" />
-                            </div>
-                            <div class="small-spacer"></div>
-                            <div>
-                                <span >To:</span>
-                                <input id="toDate" value="" placeholder="mm/dd/yyyy" title="datepicker" style="width: 100%" /><br/>
-                            </div>
-                            <a class="btn btn-main openModal" data-category="3" data-filter="custom" id="search">Search</a>
-                            -->
                         </div>
                     </div>
                     <div class="small-spacer"></div>
@@ -227,7 +216,63 @@
                 <!-- Modal body -->
                 <div class="modal-body">
 
-                    <div class="row">
+                    <div class="row" id="modal-filters">
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Search by date:
+                                </div>
+                                <div class="col-sm-3">
+                                    From: <input id="fromDate" value="" placeholder="mm/dd/yyyy" title="datepicker"  />
+                                </div>
+                                <div class="col-sm-3">
+                                    To: <input id="toDate" value="" placeholder="mm/dd/yyyy" title="datepicker" /><br/>
+                                </div>
+                                <div class="col-sm-3">
+                                </div>
+                            </div>
+
+                            <div class="small-spacer"></div>
+
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Search by importance:
+                                </div>
+                                <div class="col-sm-9">
+                                    <label class="very-high-importance" >
+                                        <input type="checkbox" name="importance-filter" value="Very High"> Very High
+                                    </label>
+                                    <label class="high-importance">
+                                        <input  type="checkbox" name="importance-filter" value="High"> High
+                                    </label>
+                                    <label class="normal-importance" >
+                                        <input type="checkbox" name="importance-filter" value="Normal"> Normal
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="small-spacer"></div>
+
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Search by text:
+                                </div>
+                                <div class="col-sm-9">
+                                    <input type="text" id="text-filter" placeholder="Filter text" class="form-control inline" style="width: 75%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="small-spacer"></div>
+
+                    <div class="row" id="no-data-message-row">
+                        <div id="display-todo-modal" class="col-sm-12 center-text">
+                            <h3>No ToDo items found.</h3>
+                        </div>
+                    </div>
+
+                    <div class="row" id="todo-item-list-row">
                         <div id="display-todo-modal" class="col-sm-8">
                             <!--This is where the actual data will go-->
 
@@ -246,6 +291,7 @@
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="toggle-filters-btn" value="on" style="float: right">Hide Filters</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
 
