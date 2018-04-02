@@ -104,10 +104,6 @@ $(document).ready(function() {
     $('#toggle-filters-btn').click(function() {
         var toggleOff = $(this).val() === 'on';
         toggleFilters(! toggleOff);
-        if (toggleOff) {
-            var currentData = showData();
-            bindDataToModal(currentData.items, true);
-        }
     });
 
     $('#clear-filters-btn').click(function() {
