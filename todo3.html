@@ -30,13 +30,19 @@
     </nav>
 
     <div class="row bg-gray mainDiv ">
-        <div class="col-sm-3 card bg-white padding-all-one padding-left-two scroll  ">
-            <div class="small-spacer"></div>
-            <h4>TODO ITEMS (<span class="totalTodos">0</span>)
+        <div class="col-sm-3 card bg-white padding-all-one scroll  ">
+
+
             </h4>
-            <div class="small-spacer"></div>
-            <div>
-                <p class="card-text "><a href="#" id="search-link"><i class="fa fa-search"></i>Search ToDo Items</a></p>
+            <div class="search-box">
+                <p class="card-text "><a href="#" id="search-link">Click here to search</a></p>
+            </div>
+
+            <div class="small-spacer hr ">
+                <div class="small-spacer"></div>
+                <div class="small-spacer"></div>
+                <h4>Total Items(<span class="totalTodos">0</span>)
+
             </div>
             <div class="small-spacer"></div>
             <div id="categorized-by-importance">
@@ -104,6 +110,8 @@
                         <ul data-role="listview" class="list-group" data-bind="source: thisMonth, events: { dataBound: dataBound }"></ul>
                     </div>
                 </div>
+
+
                 <script type="text/x-kendo-tmpl" id="by-date-template">
                     <li class="list-group-item">#: name # <span class="small-text">#: kendo.toString(dueDate, 'd') #</span></li>
                 </script>
@@ -140,7 +148,7 @@
                                 </label>
                             <div class="small-spacer"></div>
                             <div class="small-spacer">
-                                <div><strong><i class="fa fa-check"></i>Step 3</strong>: Create</div>
+                                <div><strong><i class="fa fa-check"></i>Step 3</strong>: Click on the button below</div>
                                 <button type="submit" id="create-todo-item" href="#" class="btn btn-main">Create ToDo Item</button>
                             </div>
                         </form>
@@ -223,7 +231,7 @@
                                     Search by date:
                                 </div>
                                 <div class="col-sm-3">
-                                    From: <input id="fromDate" value="" placeholder="mm/dd/yyyy" title="datepicker"  />
+                                    From: <input id="fromDate" value="" placeholder="mm/dd/yyyy" title="datepicker" />
                                 </div>
                                 <div class="col-sm-3">
                                     To: <input id="toDate" value="" placeholder="mm/dd/yyyy" title="datepicker" /><br/>
@@ -239,13 +247,13 @@
                                     Search by importance:
                                 </div>
                                 <div class="col-sm-9">
-                                    <label class="very-high-importance" >
+                                    <label class="very-high-importance">
                                         <input type="checkbox" name="importance-filter" value="Very High"> Very High
                                     </label>
                                     <label class="high-importance">
                                         <input  type="checkbox" name="importance-filter" value="High"> High
                                     </label>
-                                    <label class="normal-importance" >
+                                    <label class="normal-importance">
                                         <input type="checkbox" name="importance-filter" value="Normal"> Normal
                                     </label>
                                 </div>

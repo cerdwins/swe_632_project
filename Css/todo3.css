@@ -222,3 +222,14 @@ input.invalid-input {
 .center-text {
     text-align: center;
 }
+
+.search-box {
+    border: 1px dashed #ccc;
+    margin: 5%;
+    padding: 5%;
+    text-align: center;
+}
+
+.hr {
+    border-top: 5px solid #6c5ce7 !important;
+}
