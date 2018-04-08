@@ -29,11 +29,14 @@
         <button class="btn btn-danger" id="deleteStorage">Delete Storage</button>
     </nav>
 
+
+    <div id="overlay" style="visibility:hidden"><div><center><h2 id="tutorialdata">Welcome New User! <br/> Click Anywhere to Begin</h2></center></div></div> <!--this is the overlay with instructions to users-->
+
     <div class="row bg-gray mainDiv ">
-        <div class="col-sm-3 card bg-white padding-all-one scroll  ">
+        <div class="col-sm-3 card bg-white padding-all-one scroll  " id="searchArea">
 
-
-            </h4>
+           
+            
             <div class="search-box">
                 <p class="card-text "><a href="#" id="search-link">Click here to search</a></p>
             </div>
@@ -111,6 +114,7 @@
                     </div>
                 </div>
 
+    
 
                 <script type="text/x-kendo-tmpl" id="by-date-template">
                     <li class="list-group-item">#: name # <span class="small-text">#: kendo.toString(dueDate, 'd') #</span></li>
@@ -119,7 +123,7 @@
         </div>
         <div class=" col-sm-9 bg-white padding-all-one">
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-6" id="createArea">
                     <h3><i class="fa fa-list-alt"></i> ToDo list in three simple steps</h3>
                     <div class="small-spacer"></div>
                     <div>

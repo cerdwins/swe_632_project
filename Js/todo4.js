@@ -1,5 +1,4 @@
 $(document).ready(function() {
-
     $('#notification').kendoNotification({
         position: {
             top: 30
@@ -136,6 +135,11 @@ $(document).ready(function() {
         $('#md-todoList ul.list-group').empty();
     });
 
+    var isData = showData();
+    if(isData == null || isData.index == 0){
+        showTutorial();
+    }
+
     rapidRefresh();
 });
 
@@ -251,14 +255,12 @@ function deleteItem(id) {
 //updates the counts above the ToDo list
 function updateToDoCounts() {
     var data = showData();
+    updateTotalTODO(data.items.length)
     if (data != null) {
-        $('.totalTodos').text(data.total);
         var completedData = data.items.filter(element => element.isCompleted);
-
         document.getElementById("completed-badge").innerText = completedData.length;
         document.getElementById("uncompleted-badge").innerText = data.items.length - completedData.length;
     } else {
-        $('.totalTodos').text('0');
         document.getElementById("completed-badge").innerText = 0;
         document.getElementById("uncompleted-badge").innerText = 0;
     }
@@ -814,3 +816,56 @@ var categorizedItems = (function() {
     }
 }());
 
+
+//updates the total number of todo items 
+function updateTotalTODO(total){
+    $("span.totalTodos").text(total);
+    $("span.totalTodos").val(total);
+}
+
+//displays a short tutorial
+function showTutorial(){
+    $("#overlay").css("visibility", "visible");
+    $("#overlay").one("click", function(){
+        displaySlide1();
+    })
+}
+
+
+//displays the first tutorial slide
+function displaySlide1(){
+    $("#overlay div").css("right", "0");
+    $("#overlay div").css("bottom", "0");
+    $("#overlay div").css("position", "absolute");
+    $("#tutorialdata").html("Use the highlighted area to input new data into the ToDo List. <br/>1)You will need to enter a date <br/>" +
+        "2)Enter the ToDo item's name <br/>3)Select the Importance <br/>4)Press the Create ToDo Item button <br/> Click Anywhere to Continue the Tutorial")
+    $("#createArea").css("z-index","5");
+    $("#createArea").css("background-color", "white");
+    $("body").one("click", function(){
+        $("body").one("click", function(){
+            $("#createArea").css("z-index","0");
+            displaySlide2();
+        });
+    });
+}
+
+//displays slide 2
+function displaySlide2(){
+    $("#tutorialdata").html("Click a date on the Calendar 1 time to select date for Step 1.  Click 2 times to search for any ToDo items on a given day. <br/> Click Anywhere to Continue the Tutorial");
+    $("#upper-section").css("z-index","5");
+    $("#upper-section").css("background-color", "white");
+    $("body").one("click", function(){
+        $("#upper-section").css("z-index","");
+        displaySlide3();
+    });
+}
+
+function displaySlide3(){
+    $("#tutorialdata").html("To search for items use the highlighted area.  You can search based on date or importance.<br/> Click Anywhere to Close the Tutorial");
+    $("#searchArea").css("z-index","5");
+    $("#searchArea").css("background-color", "white");
+    $("body").one("click", function(){
+        $("#searchArea").css("z-index","0");
+        $("#overlay").css("visibility", "hidden");
+    });
+}
