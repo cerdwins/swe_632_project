@@ -19,6 +19,7 @@ $(document).ready(function() {
         change: function() {
             var dateSelected = toMMDDYYYY(this.value());
             displayCalendarValue(dateSelected);
+            $('#create-todo-item-form').change();
         },
         navigate: function() {
             $(".k-link").off('dblclick').dblclick(function() {
@@ -39,9 +40,6 @@ $(document).ready(function() {
         change: function() {
             if (this.value()) {
                 calendar.value(this.value());
-            } else {
-                notifyError("Date entered is invalid. Please try again.");
-                //this.value(calendar.value());
             }
         }
     }).kendoMaskedTextBox({ mask: '00/00/0000' });
@@ -85,7 +83,9 @@ $(document).ready(function() {
             $('#createdAlert').removeClass('hide').addClass('show');
             rapidRefresh();
             notify('Your ToDo item has been added');
+            $('#create-todo-item-form').change();
         }
+
     });
 
     $('#simple-input').change(function() {
@@ -139,6 +139,29 @@ $(document).ready(function() {
     if (isData == null || isData.index == 0) {
         showTutorial();
     }
+
+    var arrowRightClass = 'fa-arrow-right', checkClass = 'fa-check';
+    $('#create-todo-item-form').on('change keyup', function() {
+        var todoName = $('#simple-input').val();
+        var dueDate = $('#todoDueDate').data().kendoDatePicker.value();
+        if (! todoName) {
+            $('#simple-input-icon').removeClass(checkClass).addClass(arrowRightClass);
+        } else {
+            $('#simple-input-icon').removeClass(arrowRightClass).addClass(checkClass);
+        }
+        if (! dueDate) {
+            $('#due-date-icon').removeClass(checkClass).addClass(arrowRightClass);
+        } else {
+            $('#due-date-icon').removeClass(arrowRightClass).addClass(checkClass);
+        }
+        if (! (todoName && dueDate)) {
+            $('#create-todo-item-icon').removeClass(checkClass).addClass(arrowRightClass);
+            $('#create-todo-item').prop('disabled', true);
+        } else {
+            $('#create-todo-item-icon').removeClass(arrowRightClass).addClass(checkClass);
+            $('#create-todo-item').prop('disabled', false);
+        }
+    }).change();
 
     rapidRefresh();
 });
@@ -197,10 +220,10 @@ var VERY_HIGH_IMPORTANCE = 'Very High',
     HIGH_IMPORTANCE = 'High',
     NORMAL_IMPORTANCE = 'Normal';
 
-var importanceClass = {};
-importanceClass[VERY_HIGH_IMPORTANCE] = "veryHighList";
-importanceClass[HIGH_IMPORTANCE] = "highList";
-importanceClass[NORMAL_IMPORTANCE] = "normalList";
+var importanceClass = { };
+importanceClass[VERY_HIGH_IMPORTANCE]   = "veryHighList";
+importanceClass[HIGH_IMPORTANCE]        = "highList";
+importanceClass[NORMAL_IMPORTANCE]      = "normalList";
 
 var searchCategory = {
     BY_IMPORTANCE: '1',
@@ -255,8 +278,8 @@ function deleteItem(id) {
 //updates the counts above the ToDo list
 function updateToDoCounts() {
     var data = showData();
-    updateTotalTODO(data.items.length)
     if (data != null) {
+        updateTotalTODO(data.items.length)
         var completedData = data.items.filter(element => element.isCompleted);
         document.getElementById("completed-badge").innerText = completedData.length;
         document.getElementById("uncompleted-badge").innerText = data.items.length - completedData.length;
@@ -335,11 +358,9 @@ function setDataToLocalStorage(data) {
 function addToDoList(name, dueDate, importance, isCompleted) {
     //get the local storage data // get the index of the highest item // add to the list //set the localstorage
     var currentData = getDataFromLocalStorage() || {
-        total: 0,
         index: 0,
         items: []
     };
-    currentData.total += 1;
     currentData.index += 1;
     var toDo = new Todo(currentData.index, name, dueDate, importance, isCompleted);
     currentData.items.push(toDo);
@@ -369,7 +390,7 @@ function changeStatusOfAToDo(id) {
     //Search for the items
     var currentData = showData();
     //Check to see if there is any item in the storage
-    if (currentData && currentData.total > 0) {
+    if (currentData && currentData.items.length > 0) {
         for (i = 0, len = currentData.items.length; i < len; i++) {
             var item = currentData.items[i];
             if (item.id === id) {
@@ -397,10 +418,9 @@ function deleteItemFromStorage(id) {
     if (id) {
         var currentData = showData();
         if (currentData) {
-            if (currentData.total == 1) {
+            if (currentData.items.length == 1) {
                 localStorage.clear();
             } else {
-                currentData.total -= 1;
                 currentData.items = removeItemFromArray(currentData.items, id);
                 setDataToLocalStorage(currentData);
             }
@@ -441,7 +461,7 @@ function notifyError(message) {
     $('#notification').data('kendoNotification').error(message);
 }
 
-var searchActions = {};
+var searchActions = { };
 searchActions[searchCategory.BY_IMPORTANCE] = function(items, filter) {
     switch (filter) {
         case "veryhigh":
@@ -541,15 +561,15 @@ function displayDataInModal(isModalRefresh, category, filter) {
 }
 
 var itemTemplate = kendo.template(
-    '<li class="list-group-item #= importanceClass[importance] #">' +
-    '     <label class="form-check-label main #= isCompleted ? "completed-item" : "" #">' +
-    '         <input data-internalid="#= id #" data-completed="#= completed #" type="checkbox" ' +
-    '             class="form-check-input changeStatus" value="#= importance #" #= isCompleted ? "checked" : "" #>' +
-    '           #= name #<span class="checkmark"></span>' +
-    '     </label>' +
-    '     <i data-id="#= id #"  class="fa fa-trash float-right trash">' +
-    '     </i><p class="small-text">Due Date: #= kendo.toString(new Date(dueDate), "MM/dd/yyyy") #</p>' +
-    '</li>');
+    '<li class="list-group-item #= importanceClass[importance] #">'
+    + '     <label class="form-check-label main #= isCompleted ? "completed-item" : "" #">'
+    + '         <input data-internalid="#= id #" data-completed="#= isCompleted #" type="checkbox" '
+    + '             class="form-check-input changeStatus" value="#= importance #" #= isCompleted ? "checked" : "" #>'
+    + '           #= name #<span class="checkmark"></span>'
+    + '     </label>'
+    + '     <i data-id="#= id #"  class="fa fa-trash float-right trash">'
+    + '     </i><p class="small-text">Due Date: #= kendo.toString(new Date(dueDate), "MM/dd/yyyy") #</p>'
+    + '</li>');
 
 //this will create a modal and bind the incoming data to it
 function bindDataToModal(data, isModalRefresh) {
