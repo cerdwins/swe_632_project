@@ -234,6 +234,7 @@ function rapidRefresh() {
 function initialLateStateVariables() {
     $(".form-check-input").off('change').change(function() {
         var id = $(this).data("internalid");
+        console.log('test');
         changeStatusOfAToDo(id);
         rapidRefresh();
     });
@@ -255,8 +256,8 @@ function deleteItem(id) {
 //updates the counts above the ToDo list
 function updateToDoCounts() {
     var data = showData();
-    updateTotalTODO(data.items.length)
     if (data != null) {
+        updateTotalTODO(data.items.length)
         var completedData = data.items.filter(element => element.isCompleted);
         document.getElementById("completed-badge").innerText = completedData.length;
         document.getElementById("uncompleted-badge").innerText = data.items.length - completedData.length;
@@ -335,11 +336,9 @@ function setDataToLocalStorage(data) {
 function addToDoList(name, dueDate, importance, isCompleted) {
     //get the local storage data // get the index of the highest item // add to the list //set the localstorage
     var currentData = getDataFromLocalStorage() || {
-        total: 0,
         index: 0,
         items: []
     };
-    currentData.total += 1;
     currentData.index += 1;
     var toDo = new Todo(currentData.index, name, dueDate, importance, isCompleted);
     currentData.items.push(toDo);
@@ -368,8 +367,10 @@ function changeStatusOfAToDo(id) {
     var i, len;
     //Search for the items
     var currentData = showData();
+    console.log(currentData );
     //Check to see if there is any item in the storage
-    if (currentData && currentData.total > 0) {
+    if (currentData && currentData.items.length > 0) {
+        console.log(currentData, id);
         for (i = 0, len = currentData.items.length; i < len; i++) {
             var item = currentData.items[i];
             if (item.id === id) {
@@ -397,10 +398,9 @@ function deleteItemFromStorage(id) {
     if (id) {
         var currentData = showData();
         if (currentData) {
-            if (currentData.total == 1) {
+            if (currentData.item.length == 1) {
                 localStorage.clear();
             } else {
-                currentData.total -= 1;
                 currentData.items = removeItemFromArray(currentData.items, id);
                 setDataToLocalStorage(currentData);
             }
@@ -543,7 +543,7 @@ function displayDataInModal(isModalRefresh, category, filter) {
 var itemTemplate = kendo.template(
     '<li class="list-group-item #= importanceClass[importance] #">'
     + '     <label class="form-check-label main #= isCompleted ? "completed-item" : "" #">'
-    + '         <input data-internalid="#= id #" data-completed="#= completed #" type="checkbox" '
+    + '         <input data-internalid="#= id #" data-completed="#= isCompleted #" type="checkbox" '
     + '             class="form-check-input changeStatus" value="#= importance #" #= isCompleted ? "checked" : "" #>'
     + '           #= name #<span class="checkmark"></span>'
     + '     </label>'
@@ -559,6 +559,7 @@ function bindDataToModal(data, isModalRefresh) {
         $('#no-data-message-row').hide();
         //populate the recent data
         $.each(data, function (index, value) {
+            console.log(value);
             $('#md-todoList ul.list-group').append(itemTemplate(value));
         });
     } else {
