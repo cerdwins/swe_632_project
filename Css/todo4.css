@@ -28,6 +28,12 @@ input.invalid-input {
     border-color: #dc3545;
 }
 
+#tutorialdata {
+    text-align: left;
+    padding-left: 4%;
+    font-size: 15px;
+}
+
 #deleteStorage {
     position: absolute;
     right: 1%;
@@ -234,25 +240,23 @@ input.invalid-input {
     border-top: 5px solid #6c5ce7 !important;
 }
 
+div#overlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
 
-div#overlay{
-    width:100%;
-    height:100%;
-    position:fixed;
-    top:0;
-    left:0;
-    background-color:rgba(0,0,0,0.6);
-    z-index:1;
-    
-  }
-
-div#overlay div{
-    text-align:center;
+div#overlay div {
+    text-align: center;
     width: 600px;
     color: black;
     align-self: center;
-    background-color:white;
-    color:black;
+    background-color: white;
+    color: black;
     margin: 0 auto;
-    margin-top:10%;
+    margin-top: 10%;
 }

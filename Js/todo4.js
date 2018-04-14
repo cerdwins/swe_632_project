@@ -21,7 +21,7 @@ $(document).ready(function() {
             displayCalendarValue(dateSelected);
         },
         navigate: function() {
-            $(".k-link").off('dblclick').dblclick(function(){
+            $(".k-link").off('dblclick').dblclick(function() {
                 displayDataInModal(false, "4", "custom")
             });
         }
@@ -102,7 +102,7 @@ $(document).ready(function() {
 
     $('#toggle-filters-btn').click(function() {
         var toggleOff = $(this).val() === 'on';
-        toggleFilters(! toggleOff);
+        toggleFilters(!toggleOff);
     });
 
     $('#clear-filters-btn').click(function() {
@@ -136,7 +136,7 @@ $(document).ready(function() {
     });
 
     var isData = showData();
-    if(isData == null || isData.index == 0){
+    if (isData == null || isData.index == 0) {
         showTutorial();
     }
 
@@ -234,7 +234,6 @@ function rapidRefresh() {
 function initialLateStateVariables() {
     $(".form-check-input").off('change').change(function() {
         var id = $(this).data("internalid");
-        console.log('test');
         changeStatusOfAToDo(id);
         rapidRefresh();
     });
@@ -367,7 +366,6 @@ function changeStatusOfAToDo(id) {
     var i, len;
     //Search for the items
     var currentData = showData();
-    console.log(currentData );
     //Check to see if there is any item in the storage
     if (currentData && currentData.items.length > 0) {
         console.log(currentData, id);
@@ -558,8 +556,7 @@ function bindDataToModal(data, isModalRefresh) {
         $('#todo-item-list-row').show();
         $('#no-data-message-row').hide();
         //populate the recent data
-        $.each(data, function (index, value) {
-            console.log(value);
+        $.each(data, function(index, value) {
             $('#md-todoList ul.list-group').append(itemTemplate(value));
         });
     } else {
@@ -685,9 +682,9 @@ function filterByText(text, items) {
 }
 
 function filterByImportance(importanceTypes, items) {
-   return items.filter(function(element) {
+    return items.filter(function(element) {
         return importanceTypes.indexOf(element.importance) > -1;
-   });
+    });
 }
 
 /**********MODAL DONE*************** */
@@ -819,54 +816,56 @@ var categorizedItems = (function() {
 
 
 //updates the total number of todo items 
-function updateTotalTODO(total){
+function updateTotalTODO(total) {
     $("span.totalTodos").text(total);
     $("span.totalTodos").val(total);
 }
 
 //displays a short tutorial
-function showTutorial(){
+function showTutorial() {
     $("#overlay").css("visibility", "visible");
-    $("#overlay").one("click", function(){
+    $("#overlay").one("click", function() {
         displaySlide1();
     })
 }
 
 
 //displays the first tutorial slide
-function displaySlide1(){
+function displaySlide1() {
     $("#overlay div").css("right", "0");
     $("#overlay div").css("bottom", "0");
     $("#overlay div").css("position", "absolute");
-    $("#tutorialdata").html("Use the highlighted area to input new data into the ToDo List. <br/>1)You will need to enter a date <br/>" +
-        "2)Enter the ToDo item's name <br/>3)Select the Importance <br/>4)Press the Create ToDo Item button <br/> Click Anywhere to Continue the Tutorial")
-    $("#createArea").css("z-index","5");
+    $("#tutorialdata").html("<h5 class='card-header'>How to create TODO?</h5><br/><br/>Use the highlighted area to input new data into the ToDo List. <br/>1)You will need to enter a date <br/>" +
+        "2)Enter the ToDo item's name <br/>3)Select the Importance <br/>4)Press the Create ToDo Item button <br/><br/>")
+    $("#createArea").css("z-index", "5");
     $("#createArea").css("background-color", "white");
-    $("body").one("click", function(){
-        $("body").one("click", function(){
-            $("#createArea").css("z-index","0");
+    $("body").one("click", function() {
+        $("body").one("click", function() {
+            $("#createArea").css("z-index", "0");
             displaySlide2();
         });
     });
 }
 
 //displays slide 2
-function displaySlide2(){
-    $("#tutorialdata").html("Click a date on the Calendar 1 time to select date for Step 1.  Click 2 times to search for any ToDo items on a given day. <br/> Click Anywhere to Continue the Tutorial");
-    $("#upper-section").css("z-index","5");
+function displaySlide2() {
+    $("#overlay div").css("left", "0");
+    $("#overlay div").css("bottom", "0");
+    $("#tutorialdata").html("<h5 class='card-header'>Select dates on calendar</h5><br/><br/>Click a date on the Calendar one time to select date for Step 1.  <br/>Click two times to search for any ToDo items on a given day. <br/><br/>");
+    $("#upper-section").css("z-index", "5");
     $("#upper-section").css("background-color", "white");
-    $("body").one("click", function(){
-        $("#upper-section").css("z-index","");
+    $("body").one("click", function() {
+        $("#upper-section").css("z-index", "");
         displaySlide3();
     });
 }
 
-function displaySlide3(){
-    $("#tutorialdata").html("To search for items use the highlighted area.  You can search based on date or importance.<br/> Click Anywhere to Close the Tutorial");
-    $("#searchArea").css("z-index","5");
+function displaySlide3() {
+    $("#tutorialdata").html("<h5 class='card-header'>Searching for todo</h5><br/><br/>To search for items use the highlighted area or to perform a master search, click on the search link.  You can search based on date or importance.<br/><br/>");
+    $("#searchArea").css("z-index", "5");
     $("#searchArea").css("background-color", "white");
-    $("body").one("click", function(){
-        $("#searchArea").css("z-index","0");
+    $("body").one("click", function() {
+        $("#searchArea").css("z-index", "0");
         $("#overlay").css("visibility", "hidden");
     });
 }
