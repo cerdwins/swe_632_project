@@ -154,12 +154,12 @@
                     </div>
                     <div id="todoItem">
                         <form id="create-todo-item-form" action="#">
-                            <div><strong><i class="fa fa-check"></i>Step 1</strong>: Pick a Date </div>
+                            <div><strong><i id="due-date-icon" class="fa fa-check"></i>Step 1</strong>: Pick a Date </div>
                             <p>
                                 <label for="todoDueDate"><i class="fa fa-calendar"></i>Currently selected date on the calendar:</label>
                                 <input id="todoDueDate" value="" placeholder="mm/dd/yyyy" title="datepicker" style="width: 150px">
                             </p>
-                            <div><strong><i class="fa fa-check"></i>Step 2</strong>: Enter ToDo Item </div>
+                            <div><strong><i id="simple-input-icon" class="fa fa-check"></i>Step 2</strong>: Enter ToDo Item </div>
                             <input id="simple-input" maxlength="60" accesskey="n" type="text" placeholder="Enter ToDo name here. For example, grocery shopping" class="k-textbox" style="width: 100%;" required/>
                             <div class="small-spacer"></div>
                             <div class="small-spacer"></div>
@@ -176,8 +176,8 @@
                                 </label>
                             <div class="small-spacer"></div>
                             <div class="small-spacer">
-                                <div><strong><i class="fa fa-check"></i>Step 3</strong>: Click on the button below</div>
-                                <button type="submit" id="create-todo-item" href="#" class="btn btn-main">Create ToDo Item</button>
+                                <div><strong><i id="create-todo-item-icon" class="fa fa-check"></i>Step 3</strong>: Click on the button below</div>
+                                <button type="submit" id="create-todo-item" disabled href="#" class="btn btn-main">Create ToDo Item</button>
                             </div>
                         </form>
                     </div>

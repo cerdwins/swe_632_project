@@ -19,6 +19,7 @@ $(document).ready(function() {
         change: function() {
             var dateSelected = toMMDDYYYY(this.value());
             displayCalendarValue(dateSelected);
+            $('#create-todo-item-form').change();
         },
         navigate: function() {
             $(".k-link").off('dblclick').dblclick(function() {
@@ -39,9 +40,6 @@ $(document).ready(function() {
         change: function() {
             if (this.value()) {
                 calendar.value(this.value());
-            } else {
-                notifyError("Date entered is invalid. Please try again.");
-                //this.value(calendar.value());
             }
         }
     }).kendoMaskedTextBox({ mask: '00/00/0000' });
@@ -85,7 +83,9 @@ $(document).ready(function() {
             $('#createdAlert').removeClass('hide').addClass('show');
             rapidRefresh();
             notify('Your ToDo item has been added');
+            $('#create-todo-item-form').change();
         }
+
     });
 
     $('#simple-input').change(function() {
@@ -139,6 +139,29 @@ $(document).ready(function() {
     if (isData == null || isData.index == 0) {
         showTutorial();
     }
+
+    var arrowRightClass = 'fa-arrow-right', checkClass = 'fa-check';
+    $('#create-todo-item-form').on('change keyup', function() {
+        var todoName = $('#simple-input').val();
+        var dueDate = $('#todoDueDate').data().kendoDatePicker.value();
+        if (! todoName) {
+            $('#simple-input-icon').removeClass(checkClass).addClass(arrowRightClass);
+        } else {
+            $('#simple-input-icon').removeClass(arrowRightClass).addClass(checkClass);
+        }
+        if (! dueDate) {
+            $('#due-date-icon').removeClass(checkClass).addClass(arrowRightClass);
+        } else {
+            $('#due-date-icon').removeClass(arrowRightClass).addClass(checkClass);
+        }
+        if (! (todoName && dueDate)) {
+            $('#create-todo-item-icon').removeClass(checkClass).addClass(arrowRightClass);
+            $('#create-todo-item').prop('disabled', true);
+        } else {
+            $('#create-todo-item-icon').removeClass(arrowRightClass).addClass(checkClass);
+            $('#create-todo-item').prop('disabled', false);
+        }
+    }).change();
 
     rapidRefresh();
 });
@@ -368,7 +391,6 @@ function changeStatusOfAToDo(id) {
     var currentData = showData();
     //Check to see if there is any item in the storage
     if (currentData && currentData.items.length > 0) {
-        console.log(currentData, id);
         for (i = 0, len = currentData.items.length; i < len; i++) {
             var item = currentData.items[i];
             if (item.id === id) {
@@ -396,7 +418,7 @@ function deleteItemFromStorage(id) {
     if (id) {
         var currentData = showData();
         if (currentData) {
-            if (currentData.item.length == 1) {
+            if (currentData.items.length == 1) {
                 localStorage.clear();
             } else {
                 currentData.items = removeItemFromArray(currentData.items, id);
