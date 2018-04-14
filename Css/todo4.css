@@ -28,6 +28,16 @@ input.invalid-input {
     border-color: #dc3545;
 }
 
+.totalItems {
+    font-style: italic;
+    letter-spacing: 4px;
+    font-size: 20px;
+}
+
+.k-calendar td {
+    padding: 3% !important;
+}
+
 #tutorialdata {
     text-align: left;
     padding-left: 4%;
@@ -77,6 +87,7 @@ input.invalid-input {
 
 #mainCalendar {
     width: 96%;
+    box-shadow: 1px 1px 2px 4px #dee2e6;
 }
 
 #todoItem,
