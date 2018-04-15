@@ -263,7 +263,9 @@ function getDatesForCalendar(currentData) {
     var toDate = kendo.date.lastDayOfMonth(today);
     var dates;
     var itemsInMonth = searchBetweenDates(currentData, fromDate, toDate);
-    dates = itemsInMonth.map(function(item) {
+    dates = itemsInMonth.filter(function(item) {
+        return ! item.isCompleted;
+    }).map(function(item) {
         return new Date(item.dueDate).getTime();
     });
     return dates;
@@ -271,10 +273,13 @@ function getDatesForCalendar(currentData) {
 
 //updates and refreshes the todo list
 function rapidRefresh() {
+    var currentData = showData();
     emptyToDoList();
-    showToDoList();
-    updateToDoCounts();
+    showToDoList(currentData);
+    updateToDoCounts(currentData);
     initialLateStateVariables(); //intializes the variables that are only now available
+    var calendar = $("#mainCalendar").data().kendoCalendar;
+    calendar.setOptions({ dates: getDatesForCalendar(currentData.items) });
 }
 
 //moves something to the completed bin or the uncompleted bin
@@ -300,8 +305,7 @@ function deleteItem(id) {
 }
 
 //updates the counts above the ToDo list
-function updateToDoCounts() {
-    var data = showData();
+function updateToDoCounts(data) {
     if (data != null) {
         updateTotalTODO(data.items.length)
         var completedData = data.items.filter(element => element.isCompleted);
@@ -322,8 +326,7 @@ function emptyToDoList() {
 
 
 //Creates the lists in the "Most Recent Todo Items" area
-function showToDoList() {
-    var currentData = showData();
+function showToDoList(currentData) {
     if (currentData != null) {
         for (i = 0; i < currentData.items.length; i++) {
             createLineItemInToDoList(currentData.items[i]);
@@ -391,8 +394,6 @@ function addToDoList(name, dueDate, importance, isCompleted) {
     setDataToLocalStorage(currentData);
     categorizedItems.addItem(toDo);
     $('#simple-input').val('');
-    var calendar = $("#mainCalendar").data().kendoCalendar;
-    calendar.setOptions({ dates: getDatesForCalendar(currentData.items) });
 }
 
 function findToDoItemById(id) {
@@ -451,11 +452,8 @@ function deleteItemFromStorage(id) {
                 setDataToLocalStorage(currentData);
             }
             categorizedItems.removeItem(id);
-            var calendar = $("#mainCalendar").data().kendoCalendar;
-            calendar.setOptions({ dates: getDatesForCalendar(currentData.items) });
         }
     }
-
 }
 
 //Utility methods- this will return a new array
@@ -639,7 +637,7 @@ function searchBetweenDates(currentData, fromDate, toDate) {
 //Change status within the modal
 $("#md-todoList").on('change', '.changeStatus', function() {
     var currentData = showData();
-    var index = parseInt($(this).attr("data-id"));
+    var index = parseInt($(this).attr("data-internalid"));
     changeStatusOfAToDo(index);
     notify("Completion status changed");
     rapidRefresh();
