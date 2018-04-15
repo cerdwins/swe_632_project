@@ -1,4 +1,5 @@
 $(document).ready(function() {
+
     $('#notification').kendoNotification({
         position: {
             top: 30
@@ -11,6 +12,11 @@ $(document).ready(function() {
         height: 50
     });
 
+    var currentData = showData();
+    var dates = null;
+    if (currentData && currentData.items) {
+        dates = getDatesForCalendar(currentData.items);
+    }
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
         value: kendo.date.today(),
@@ -22,10 +28,14 @@ $(document).ready(function() {
             $('#create-todo-item-form').change();
         },
         navigate: function() {
-            $(".k-link").off('dblclick').dblclick(function() {
-                displayDataInModal(false, "4", "custom")
+            $(".k-month td").off('dblclick').dblclick(function() {
+                displayDataInModal(false, "4", "custom");
             });
-        }
+        },
+        month: {
+            content: '<div class="#= $.inArray(data.date.getTime(), data.dates) > -1 ? "badge badge-info badge-pill" : "" #">#= data.value #</div>'
+        },
+        dates: dates
     });
 
     $("#toDate, #fromDate").kendoDatePicker({
@@ -140,8 +150,8 @@ $(document).ready(function() {
         showTutorial();
     }
 
-    var arrowRightClass = 'fa-arrow-right', checkClass = 'fa-check';
     $('#create-todo-item-form').on('change keyup', function() {
+        var arrowRightClass = 'fa-arrow-right', checkClass = 'fa-check';
         var todoName = $('#simple-input').val();
         var dueDate = $('#todoDueDate').data().kendoDatePicker.value();
         if (! todoName) {
@@ -244,6 +254,20 @@ var searchType = {
     MONTH: 'month',
     CUSTOM: 'custom'
 };
+
+
+function getDatesForCalendar(currentData) {
+    currentData = currentData || [];
+    var today = kendo.date.today();
+    var fromDate = kendo.date.firstDayOfMonth(today);
+    var toDate = kendo.date.lastDayOfMonth(today);
+    var dates;
+    var itemsInMonth = searchBetweenDates(currentData, fromDate, toDate);
+    dates = itemsInMonth.map(function(item) {
+        return new Date(item.dueDate).getTime();
+    });
+    return dates;
+}
 
 //updates and refreshes the todo list
 function rapidRefresh() {
@@ -367,6 +391,8 @@ function addToDoList(name, dueDate, importance, isCompleted) {
     setDataToLocalStorage(currentData);
     categorizedItems.addItem(toDo);
     $('#simple-input').val('');
+    var calendar = $("#mainCalendar").data().kendoCalendar;
+    calendar.setOptions({ dates: getDatesForCalendar(currentData.items) });
 }
 
 function findToDoItemById(id) {
@@ -425,6 +451,8 @@ function deleteItemFromStorage(id) {
                 setDataToLocalStorage(currentData);
             }
             categorizedItems.removeItem(id);
+            var calendar = $("#mainCalendar").data().kendoCalendar;
+            calendar.setOptions({ dates: getDatesForCalendar(currentData.items) });
         }
     }
 
@@ -600,9 +628,9 @@ function bindDataToModal(data, isModalRefresh) {
 function searchBetweenDates(currentData, fromDate, toDate) {
     var result = [];
     if (currentData) {
-
         result = currentData.filter(function(element, index) {
-            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= toMMDDYYYYForComparing(fromDate) && toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= toMMDDYYYYForComparing(toDate);
+            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= toMMDDYYYYForComparing(fromDate) &&
+                toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= toMMDDYYYYForComparing(toDate);
         });
     }
     return result;

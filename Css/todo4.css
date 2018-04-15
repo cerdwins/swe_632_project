@@ -271,3 +271,8 @@ div#overlay div {
     margin: 0 auto;
     margin-top: 10%;
 }
+
+.k-link .badge {
+    font-size: 100%;
+}
+
