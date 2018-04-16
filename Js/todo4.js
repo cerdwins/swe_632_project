@@ -17,6 +17,9 @@ $(document).ready(function() {
     if (currentData && currentData.items) {
         dates = getDatesForCalendar(currentData.items);
     }
+    var popupTemplate = kendo.template('<div>There #= numItems != 1 ? "are" : "is" # #= numItems > 0 ? numItems : "no" # '
+                + 'ToDo #= numItems != 1 ? "items" : "item" # due on #= date #</div>'
+                + '<div>Double-click to view</div>');
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
         value: kendo.date.today(),
@@ -36,6 +39,22 @@ $(document).ready(function() {
             content: '<div class="#= $.inArray(data.date.getTime(), data.dates) > -1 ? "badge badge-info badge-pill" : "" #">#= data.value #</div>'
         },
         dates: dates
+    }).kendoTooltip({
+        filter: 'td',
+        width: 200,
+        height: 50,
+        position: 'top',
+        showAfter: 500,
+        content: function(e) {
+            var dateString = $(e.target).find('.k-link').data().value;
+            var dateParts = dateString.split('/');
+            var date = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]), parseInt(dateParts[2]));
+            var currentData = showData();
+            var itemsOnDate = searchBetweenDates(currentData.items, date, date).filter(function(item) {
+                return ! item.isCompleted;
+            });
+            return popupTemplate({ numItems: itemsOnDate.length, date: kendo.toString(date, 'M/d/yyyy') });
+        }
     });
 
     $("#toDate, #fromDate").kendoDatePicker({
@@ -408,7 +427,7 @@ function findToDoItemById(id) {
 
 //Display all the data
 function showData() {
-    return getDataFromLocalStorage();
+    return getDataFromLocalStorage() || { };
 }
 
 //change from completedToNotCompletedAndViceVersa
@@ -627,8 +646,7 @@ function searchBetweenDates(currentData, fromDate, toDate) {
     var result = [];
     if (currentData) {
         result = currentData.filter(function(element, index) {
-            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= toMMDDYYYYForComparing(fromDate) &&
-                toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= toMMDDYYYYForComparing(toDate);
+            return kendo.date.isInDateRange(new Date(element.dueDate), fromDate, toDate);
         });
     }
     return result;
