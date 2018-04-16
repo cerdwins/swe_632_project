@@ -52,7 +52,7 @@
 
 
             <div class="search-box">
-                <p class="card-text "><a href="#" id="search-link">Click here to search</a></p>
+                <p class="card-text "><a title="Click here to search" href="#" id="search-link">Click here to search</a></p>
             </div>
 
             <div class="small-spacer hr ">
@@ -158,21 +158,23 @@
                                 <label for="todoDueDate">
                                     <i title="Date selected on calendar" class="fa fa-calendar"></i>Currently selected date on the calendar:
                                 </label>
-                                <input id="todoDueDate" value="" placeholder="mm/dd/yyyy" title="datepicker" style="width: 150px">
+                                <input id="todoDueDate" value="" placeholder="mm/dd/yyyy" title="Select ToDo item due date" style="width: 150px">
                             </p>
                             <div><strong><i id="simple-input-icon" title="Enter ToDo Item" class="fa fa-check"></i>Step 2</strong>: Enter ToDo Item </div>
-                            <input id="simple-input" maxlength="60" accesskey="n" type="text" placeholder="Enter ToDo name here. For example, grocery shopping" class="k-textbox" style="width: 100%;" required/>
+                            <input id="simple-input" maxlength="60" accesskey="n" type="text" title="Enter ToDo item description"
+                                   placeholder="Enter ToDo name here. For example, grocery shopping" class="k-textbox"
+                                   style="width: 100%;" required/>
                             <div class="small-spacer"></div>
                             <div class="small-spacer"></div>
                             <div class="small-spacer"> <i class="fa fa-exclamation-circle" title="Choose importance"></i>Importance</div>
                             <div class="small-spacer"></div>
-                            <label name="radio-importance" class="radio-inline very-high-importance">
+                            <label name="radio-importance" class="radio-inline very-high-importance" title="Click to set importance to very high">
                                   <input class="radio" type="radio" name="importance" value="Very High">Very High
                             </label>
-                            <label name="radio-importance" class="radio-inline high-importance">
+                            <label name="radio-importance" class="radio-inline high-importance" title="Click to set importance to high">
                                   <input class="radio" type="radio" name="importance" value="High">High
                                 </label>
-                            <label name="radio-importance" class="radio-inline normal-importance">
+                            <label name="radio-importance" class="radio-inline normal-importance" title="Click to set importance to normal">
                                   <input class="radio" type="radio" name="importance" value="Normal" checked>Normal
                                 </label>
                             <div class="small-spacer"></div>
