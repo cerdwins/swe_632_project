@@ -17,6 +17,9 @@ $(document).ready(function() {
     if (currentData && currentData.items) {
         dates = getDatesForCalendar(currentData.items);
     }
+    var popupTemplate = kendo.template('<div>There #= numItems != 1 ? "are" : "is" # #= numItems > 0 ? numItems : "no" # '
+                + 'ToDo #= numItems != 1 ? "items" : "item" # due on #= date #</div>'
+                + '<div>Double-click to view</div>');
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
         value: kendo.date.today(),
@@ -36,6 +39,22 @@ $(document).ready(function() {
             content: '<div class="#= $.inArray(data.date.getTime(), data.dates) > -1 ? "badge badge-info badge-pill" : "" #">#= data.value #</div>'
         },
         dates: dates
+    }).kendoTooltip({
+        filter: 'td',
+        width: 200,
+        height: 50,
+        position: 'top',
+        showAfter: 500,
+        content: function(e) {
+            var dateString = $(e.target).find('.k-link').data().value;
+            var dateParts = dateString.split('/');
+            var date = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]), parseInt(dateParts[2]));
+            var currentData = showData();
+            var itemsOnDate = searchBetweenDates(currentData.items, date, date).filter(function(item) {
+                return ! item.isCompleted;
+            });
+            return popupTemplate({ numItems: itemsOnDate.length, date: kendo.toString(date, 'M/d/yyyy') });
+        }
     });
 
     $("#toDate, #fromDate").kendoDatePicker({
@@ -320,33 +339,25 @@ function updateToDoCounts(data) {
 
 //empties the ToDo List
 function emptyToDoList() {
-    $("#notCompleted").empty();
+    $("#notCompletedList").empty();
     $("#completedList").empty();
 }
 
 
 //Creates the lists in the "Most Recent Todo Items" area
 function showToDoList(currentData) {
-    if (currentData != null) {
+    if (currentData && currentData.items) {
+        var $completedList = $("#completedList");
+        var $notCompletedList = $("#notCompletedList");
         for (i = 0; i < currentData.items.length; i++) {
-            createLineItemInToDoList(currentData.items[i]);
+            var item = currentData.items[i];
+            var html = itemTemplate(item);
+            if (item.isCompleted) {
+                $completedList.append(html);
+            } else {
+                $notCompletedList.append(html);
+            }
         }
-    }
-}
-//convert to mm/dd/yyyy
-function toMMDDYYYYString(date) {
-    var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
-    return dateInMMDDYYYY;
-}
-
-//Creates a line item in the #list-group.  Use 1 Array Json Value
-function createLineItemInToDoList(data) {
-
-    var html = itemTemplate(data);
-    if (data.isCompleted) {
-        $("#completedList").append(html);
-    } else {
-        $("#notCompleted").append(html);
     }
 }
 
@@ -408,7 +419,7 @@ function findToDoItemById(id) {
 
 //Display all the data
 function showData() {
-    return getDataFromLocalStorage();
+    return getDataFromLocalStorage() || { };
 }
 
 //change from completedToNotCompletedAndViceVersa
@@ -465,18 +476,6 @@ function removeItemFromArray(array, id) {
 //convert to mm/dd/yyyy
 function toMMDDYYYY(date) {
     return kendo.toString(date, 'MM/dd/yyyy');
-}
-
-//convert to mm/dd/yyyy
-function toMMDDYYYYString(date) {
-    var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
-    return dateInMMDDYYYY;
-}
-
-//format
-function toMMDDYYYYForComparing(date) {
-    var dateInMMDDYYYY = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
-    return new Date(dateInMMDDYYYY);
 }
 
 function notify(message) {
@@ -591,9 +590,9 @@ var itemTemplate = kendo.template(
     + '     <label class="form-check-label main #= isCompleted ? "completed-item" : "" #">'
     + '         <input data-internalid="#= id #" data-completed="#= isCompleted #" type="checkbox" '
     + '             class="form-check-input changeStatus" value="#= importance #" #= isCompleted ? "checked" : "" #>'
-    + '           #= name #<span class="checkmark"></span>'
+    + '           #= name #<span class="checkmark" title="Click to mark ToDo item as #= isCompleted ? "not completed" : "completed" #"></span>'
     + '     </label>'
-    + '     <i data-id="#= id #"  class="fa fa-trash float-right trash">'
+    + '     <i data-id="#= id #" class="fa fa-trash float-right trash" title="Click to delete ToDo item">'
     + '     </i><p class="small-text">Due Date: #= kendo.toString(new Date(dueDate), "MM/dd/yyyy") #</p>'
     + '</li>');
 
@@ -627,8 +626,7 @@ function searchBetweenDates(currentData, fromDate, toDate) {
     var result = [];
     if (currentData) {
         result = currentData.filter(function(element, index) {
-            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= toMMDDYYYYForComparing(fromDate) &&
-                toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= toMMDDYYYYForComparing(toDate);
+            return kendo.date.isInDateRange(new Date(element.dueDate), fromDate, toDate);
         });
     }
     return result;
@@ -636,91 +634,11 @@ function searchBetweenDates(currentData, fromDate, toDate) {
 
 //Change status within the modal
 $("#md-todoList").on('change', '.changeStatus', function() {
-    var currentData = showData();
     var index = parseInt($(this).attr("data-internalid"));
     changeStatusOfAToDo(index);
     notify("Completion status changed");
     rapidRefresh();
 });
-
-//search by predefined dates
-function searchByPredefinedDates(currentData) {
-    var result = {
-        today: [],
-        thisWeek: [],
-        nextWeek: [],
-        thisMonth: []
-    };
-    if (currentData) {
-        result.today = currentData.filter(function(element, index) {
-            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() == toMMDDYYYYForComparing(new Date()).getTime();
-        });
-        result.thisWeek = currentData.filter(function(element, index) {
-            var startDate = getStartAndEndDate(dateCategory.THIS_WEEK).start;
-            var endDate = getStartAndEndDate(dateCategory.THIS_WEEK).end;
-            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= startDate && toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= endDate;
-        });
-        result.nextWeek = currentData.filter(function(element, index) {
-            var startDate = getStartAndEndDate(dateCategory.NEXT_WEEK).start;
-            var endDate = getStartAndEndDate(dateCategory.NEXT_WEEK).end;
-            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= startDate && toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= endDate;
-        });
-        result.thisMonth = currentData.filter(function(element, index) {
-            var startDate = getStartAndEndDate(dateCategory.THIS_MONTH).start;
-            var endDate = getStartAndEndDate(dateCategory.THIS_MONTH).end;
-            return toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() >= startDate && toMMDDYYYYForComparing(new Date(element.dueDate)).getTime() <= endDate;
-        });
-
-    }
-    return result;
-}
-//based on the params, it will generate start and end date
-function getStartAndEndDate(range) {
-    let result = { start: new Date(), end: new Date() };
-    switch (range.toLowerCase()) {
-        case dateCategory.TODAY:
-            result.start = toMMDDYYYYForComparing(new Date());
-            result.end = toMMDDYYYYForComparing(new Date());
-            break;
-        case dateCategory.THIS_WEEK:
-            var current = new Date();
-            var diff = current.getDate() - current.getDay();
-            result.start = toMMDDYYYYForComparing(new Date(current.setDate(diff)));
-            result.end = toMMDDYYYYForComparing(new Date(current.setDate(result.start.getDate() + 6)));
-            break;
-        case dateCategory.NEXT_WEEK:
-            var today = new Date();
-            var nextSunday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (7 - today.getDay()));
-            result.start = toMMDDYYYYForComparing(nextSunday);
-            result.end = toMMDDYYYYForComparing(new Date(today.setDate(result.start.getDate() + 6)));
-            break;
-        case dateCategory.THIS_MONTH:
-            var date = new Date(),
-                year = date.getFullYear(),
-                month = date.getMonth();
-            result.start = toMMDDYYYYForComparing(new Date(year, month, 1));
-            result.end = toMMDDYYYYForComparing(new Date(year, month + 1, 0));
-            break;
-    }
-    return result;
-}
-//search for an item by importance
-function searchByImportance(currentData) {
-    var result = { veryHigh: [], high: [], normal: [] };
-    if (currentData) {
-        result.veryHigh = currentData.filter(function(element) {
-            return element.importance === VERY_HIGH_IMPORTANCE;
-        });
-        result.high = currentData.filter(function(element) {
-            return element.importance === HIGH_IMPORTANCE;
-        });
-        result.normal = currentData.filter(function(element) {
-            return element.importance === NORMAL_IMPORTANCE;
-        });
-
-    }
-    return result;
-}
 
 function filterByText(text, items) {
     text = text.toLowerCase();
@@ -747,7 +665,7 @@ var categorizedItems = (function() {
 
     var currentData = showData() || { items: [] };
 
-    var dataModel = kendo.data.Model.define({
+    var ToDoItemModel = kendo.data.Model.define({
         id: 'id',
         fields: {
             id: {
@@ -772,7 +690,7 @@ var categorizedItems = (function() {
     var createFilteredDataSource = function(filterDefinition) {
         var ds = new kendo.data.DataSource({
             data: currentData.items,
-            schema: { model: dataModel },
+            schema: { model: ToDoItemModel },
             sort: [{ field: 'dueDate', dir: 'desc' }, { field: 'name', dir: 'asc' }],
             filter: filterDefinition
         });
