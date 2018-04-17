@@ -277,12 +277,7 @@ var searchType = {
 
 function getDatesForCalendar(currentData) {
     currentData = currentData || [];
-    var today = kendo.date.today();
-    var fromDate = kendo.date.firstDayOfMonth(today);
-    var toDate = kendo.date.lastDayOfMonth(today);
-    var dates;
-    var itemsInMonth = searchBetweenDates(currentData, fromDate, toDate);
-    dates = itemsInMonth.filter(function(item) {
+    var dates = currentData.filter(function(item) {
         return ! item.isCompleted;
     }).map(function(item) {
         return new Date(item.dueDate).getTime();
