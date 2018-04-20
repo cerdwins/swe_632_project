@@ -165,7 +165,7 @@ $(document).ready(function() {
     });
 
     var isData = showData();
-    if (isData == null || isData.index == 0) {
+    if (isData == null || isData.index == undefined || isData.index == 0) {
         showTutorial();
     }
 
