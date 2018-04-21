@@ -285,6 +285,36 @@ div#overlay div {
 
 .k-link .badge {
     font-size: 100%;
+    background-color: #6c5ce7;
+}
+
+.k-state-selected,
+.k-state-hover,
+.k-state-border-down {
+    background-color: #6c5ce7 !important;
+}
+
+.k-state-selected a,
+.k-state-hover a,
+.k-state-border-down a {
+    color: white !important;
+}
+
+.k-calendar .k-link.k-nav-fast {
+    color: white !important;
+}
+
+.k-calendar .k-header .k-icon {
+    color: white !important;
+}
+
+.k-header {
+    background-color: #6c5ce7 !important;
+}
+
+.todo-toolTip {
+    font-size: 12px;
+    font-style: italic;
 }
 
 

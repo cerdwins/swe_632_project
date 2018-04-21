@@ -17,9 +17,9 @@ $(document).ready(function() {
     if (currentData && currentData.items) {
         dates = getDatesForCalendar(currentData.items);
     }
-    var popupTemplate = kendo.template('<div>There #= numItems != 1 ? "are" : "is" # #= numItems > 0 ? numItems : "no" # '
-                + 'ToDo #= numItems != 1 ? "items" : "item" # due on #= date #</div>'
-                + '<div>Double-click to view</div>');
+    var popupTemplate = kendo.template('<div class="todo-toolTip">There #= numItems != 1 ? "are" : "is" # #= numItems > 0 ? numItems : "no" # ' +
+        'ToDo #= numItems != 1 ? "items" : "item" # due on #= date #</div>' +
+        '<div  class="todo-toolTip">Double-click to view</div>');
     // create Calendar from div HTML element
     $("#mainCalendar").kendoCalendar({
         value: kendo.date.today(),
@@ -51,7 +51,7 @@ $(document).ready(function() {
             var date = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]), parseInt(dateParts[2]));
             var currentData = showData();
             var itemsOnDate = searchBetweenDates(currentData.items, date, date).filter(function(item) {
-                return ! item.isCompleted;
+                return !item.isCompleted;
             });
             return popupTemplate({ numItems: itemsOnDate.length, date: kendo.toString(date, 'M/d/yyyy') });
         }
@@ -170,20 +170,21 @@ $(document).ready(function() {
     }
 
     $('#create-todo-item-form').on('change keyup', function() {
-        var arrowRightClass = 'fa-arrow-right', checkClass = 'fa-check';
+        var arrowRightClass = 'fa-arrow-right',
+            checkClass = 'fa-check';
         var todoName = $('#simple-input').val();
         var dueDate = $('#todoDueDate').data().kendoDatePicker.value();
-        if (! todoName) {
+        if (!todoName) {
             $('#simple-input-icon').removeClass(checkClass).addClass(arrowRightClass);
         } else {
             $('#simple-input-icon').removeClass(arrowRightClass).addClass(checkClass);
         }
-        if (! dueDate) {
+        if (!dueDate) {
             $('#due-date-icon').removeClass(checkClass).addClass(arrowRightClass);
         } else {
             $('#due-date-icon').removeClass(arrowRightClass).addClass(checkClass);
         }
-        if (! (todoName && dueDate)) {
+        if (!(todoName && dueDate)) {
             $('#create-todo-item-icon').removeClass(checkClass).addClass(arrowRightClass);
             $('#create-todo-item').prop('disabled', true);
         } else {
@@ -249,10 +250,10 @@ var VERY_HIGH_IMPORTANCE = 'Very High',
     HIGH_IMPORTANCE = 'High',
     NORMAL_IMPORTANCE = 'Normal';
 
-var importanceClass = { };
-importanceClass[VERY_HIGH_IMPORTANCE]   = "veryHighList";
-importanceClass[HIGH_IMPORTANCE]        = "highList";
-importanceClass[NORMAL_IMPORTANCE]      = "normalList";
+var importanceClass = {};
+importanceClass[VERY_HIGH_IMPORTANCE] = "veryHighList";
+importanceClass[HIGH_IMPORTANCE] = "highList";
+importanceClass[NORMAL_IMPORTANCE] = "normalList";
 
 var searchCategory = {
     BY_IMPORTANCE: '1',
@@ -278,7 +279,7 @@ var searchType = {
 function getDatesForCalendar(currentData) {
     currentData = currentData || [];
     var dates = currentData.filter(function(item) {
-        return ! item.isCompleted;
+        return !item.isCompleted;
     }).map(function(item) {
         return new Date(item.dueDate).getTime();
     });
@@ -414,7 +415,7 @@ function findToDoItemById(id) {
 
 //Display all the data
 function showData() {
-    return getDataFromLocalStorage() || { };
+    return getDataFromLocalStorage() || {};
 }
 
 //change from completedToNotCompletedAndViceVersa
@@ -481,7 +482,7 @@ function notifyError(message) {
     $('#notification').data('kendoNotification').error(message);
 }
 
-var searchActions = { };
+var searchActions = {};
 searchActions[searchCategory.BY_IMPORTANCE] = function(items, filter) {
     switch (filter) {
         case "veryhigh":
@@ -581,15 +582,15 @@ function displayDataInModal(isModalRefresh, category, filter) {
 }
 
 var itemTemplate = kendo.template(
-    '<li class="list-group-item #= importanceClass[importance] #">'
-    + '     <label class="form-check-label main #= isCompleted ? "completed-item" : "" #">'
-    + '         <input data-internalid="#= id #" data-completed="#= isCompleted #" type="checkbox" '
-    + '             class="form-check-input changeStatus" value="#= importance #" #= isCompleted ? "checked" : "" #>'
-    + '           #= name #<span class="checkmark" title="Click to mark ToDo item as #= isCompleted ? "not completed" : "completed" #"></span>'
-    + '     </label>'
-    + '     <i data-id="#= id #" class="fa fa-trash float-right trash" title="Click to delete ToDo item">'
-    + '     </i><p class="small-text">Due Date: #= kendo.toString(new Date(dueDate), "MM/dd/yyyy") #</p>'
-    + '</li>');
+    '<li class="list-group-item #= importanceClass[importance] #">' +
+    '     <label class="form-check-label main #= isCompleted ? "completed-item" : "" #">' +
+    '         <input data-internalid="#= id #" data-completed="#= isCompleted #" type="checkbox" ' +
+    '             class="form-check-input changeStatus" value="#= importance #" #= isCompleted ? "checked" : "" #>' +
+    '           #= name #<span class="checkmark" title="Click to mark ToDo item as #= isCompleted ? "not completed" : "completed" #"></span>' +
+    '     </label>' +
+    '     <i data-id="#= id #" class="fa fa-trash float-right trash" title="Click to delete ToDo item">' +
+    '     </i><p class="small-text">Due Date: #= kendo.toString(new Date(dueDate), "MM/dd/yyyy") #</p>' +
+    '</li>');
 
 //this will create a modal and bind the incoming data to it
 function bindDataToModal(data, isModalRefresh) {
