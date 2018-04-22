@@ -326,9 +326,11 @@ function updateToDoCounts(data) {
         var completedData = data.items.filter(element => element.isCompleted);
         document.getElementById("completed-badge").innerText = completedData.length;
         document.getElementById("uncompleted-badge").innerText = data.items.length - completedData.length;
+        document.getElementById("all-todos-badge").innerText = data.items.length;
     } else {
         document.getElementById("completed-badge").innerText = 0;
         document.getElementById("uncompleted-badge").innerText = 0;
+        document.getElementById("all-todos-badge").innerText = 0;
     }
 }
 
@@ -345,6 +347,7 @@ function showToDoList(currentData) {
     if (currentData && currentData.items) {
         var $completedList = $("#completedList");
         var $notCompletedList = $("#notCompletedList");
+        var $allToDosList = $("#allToDosList");
         for (i = 0; i < currentData.items.length; i++) {
             var item = currentData.items[i];
             var html = itemTemplate(item);
@@ -353,6 +356,7 @@ function showToDoList(currentData) {
             } else {
                 $notCompletedList.append(html);
             }
+            $allToDosList.append(html);
         }
     }
 }
@@ -780,7 +784,6 @@ var categorizedItems = (function() {
 //updates the total number of todo items 
 function updateTotalTODO(total) {
     $("span.totalTodos").text(total);
-    $("span.totalTodos").val(total);
 }
 
 //displays a short tutorial
