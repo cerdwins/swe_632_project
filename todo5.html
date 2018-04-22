@@ -225,28 +225,36 @@
 
                 <div class="row">
                     <div id="display-todo" class="col-sm-8">
-                        <p>There are <span class="totalTodos">0</span> ToDo items.</p>
                         <ul class="nav nav-tabs">
 
-                            <li class="nav-item" title="Click to view completed ToDo items">
-                                <a class="nav-link" data-toggle="tab" href="#completed">
-                                    Completed <span class="badge badge-primary badge-pill" id="completed-badge">0</span>
-                                </a>
-                            </li>
                             <li class="nav-item" title="Click to view ToDo items not yet completed">
                                 <a class="nav-link active show" data-toggle="tab" href="#notCompleted">
                                     Not completed <span class="badge badge-danger badge-pill" id="uncompleted-badge">0</span>
                                 </a>
                             </li>
+                            <li class="nav-item" title="Click to view completed ToDo items">
+                                <a class="nav-link" data-toggle="tab" href="#completed">
+                                    Completed <span class="badge badge-primary badge-pill" id="completed-badge">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item" title="Click to view all ToDo items">
+                                <a class="nav-link" data-toggle="tab" href="#allToDos">
+                                    All <span class="badge badge-secondary badge-pill" id="all-todos-badge">0</span>
+                                </a>
+                            </li>
                         </ul>
                         <!--This is where the actual data will go-->
                         <div class="tab-content">
+                            <div class="tab-pane container active show" id="notCompleted">
+                                <ul class="list-group" id="notCompletedList">
+                                </ul>
+                            </div>
                             <div class="tab-pane container" id="completed">
                                 <ul class="list-group" id="completedList">
                                 </ul>
                             </div>
-                            <div class="tab-pane container active show" id="notCompleted">
-                                <ul class="list-group" id="notCompletedList">
+                            <div class="tab-pane container" id="allToDos">
+                                <ul class="list-group" id="allToDosList">
                                 </ul>
                             </div>
                         </div>
