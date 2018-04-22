@@ -16,7 +16,7 @@
 }
 
 .high-importance {
-    color: #887702;
+    color: #f27a3d;
 }
 
 #simple-input {
@@ -156,7 +156,7 @@ div.category.padding-left-six {
 }
 
 .highList {
-    border-left: 5px solid #887702 !important;
+    border-left: 5px solid #f27a3d !important;
 }
 
 .normalList {
@@ -350,4 +350,36 @@ div#overlay div {
 
 #deleteStorage {
     background-color: white;
+}
+
+.badge-primary {
+    background-color: #0984e3;
+}
+
+.badge-secondary {
+    background-color: #6c5ce7;
+}
+
+.badge-warning {
+    color: white;
+    background-color: #f27a3d;
+}
+
+.badge-danger {
+    background-color: #EA2027;
+}
+
+.radio + .fa-circle-o + .fa-check-circle-o {
+    display: none;
+}
+
+.radio + .fa-circle-o {
+    display: inline;
+}
+.radio:checked + .fa-circle-o + .fa-check-circle-o {
+    display: inline;
+}
+
+.radio:checked + .fa-circle-o {
+    display: none;
 }
